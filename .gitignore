@@ -21,6 +21,9 @@ history/
 run-server.bat
 *.log
 
+# ── Fichiers de travail (non publiés) ──
+TODO-publication.md
+
 # ── Système / éditeurs ──
 Thumbs.db
 .DS_Store
