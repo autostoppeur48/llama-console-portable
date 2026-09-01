@@ -1,0 +1,12 @@
+{
+  "ctxSize": 32768,
+  "ngl": 99,
+  "cacheType": "q8_0",
+  "flashAttn": "on",
+  "reasoningFormat": "",
+  "topK": -1,
+  "topP": 0.95,
+  "minP": 0.05,
+  "repeatPenalty": 1.0,
+  "repeatLastN": 64
+}

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Llama Console</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div class="brand">🦙 Llama Console</div>
+  <div class="status" id="statusPill"><span class="dot off" id="statusDot"></span><span id="statusText">hors ligne</span></div>
+</header>
+
+<main>
+  <div id="messages"></div>
+
+  <div class="params">
+    <details>
+      <summary>⚙ Paramètres</summary>
+      <div class="grid2">
+        <div class="field">
+          <label>max_tokens</label>
+          <input id="maxTokens" type="number" min="16" step="16">
+        </div>
+        <div class="field">
+          <label>temperature</label>
+          <input id="temperature" type="number" min="0" max="2" step="0.1">
+        </div>
+        <div class="field">
+          <label>Seuil compaction auto (%)</label>
+          <input id="compactPct" type="number" min="10" max="95" step="5">
+        </div>
+      </div>
+      <div class="field">
+        <label>System prompt (optionnel)</label>
+        <textarea id="systemPrompt" rows="3" placeholder="Tu es un assistant utile..."></textarea>
+      </div>
+      <div class="actions">
+        <button id="btnCompact" class="ghost">🧹 Compacter maintenant</button>
+        <button id="btnClear" class="ghost">Nouvelle conversation</button>
+      </div>
+      <div class="compact-status" id="compactStatus"></div>
+    </details>
+  </div>
+
+  <div class="composer">
+    <div class="agent-bar">
+      <label class="toggle"><input type="checkbox" id="agentToggle" checked> 🤖 Mode Agent</label>
+      <label class="toggle" id="agentAutoApproveWrap"><input type="checkbox" id="agentAutoApprove" title="Exécuter les commandes shell sans demander"> ⚡ Auto-approuver</label>
+
+      <label class="toggle"><input type="checkbox" id="planMode" title="Proposer un plan avant d'agir et attendre ton approbation"> 📋 Mode plan</label>
+      <label class="toggle"><input type="checkbox" id="traceMode" title="Tracer chaque modification de fichier code dans history/"> 🔍 Tracer les modifs</label>
+    </div>
+    <select id="reasoningEffortChat" class="reasoning-select" title="Effort de réflexion">
+      <option value="">🧠 auto</option>
+      <option value="none">🧠 none</option>
+      <option value="low">🧠 low</option>
+      <option value="medium" selected>🧠 medium</option>
+      <option value="high">🧠 high</option>
+      <option value="xhigh">🧠 xhigh</option>
+    </select>
+    <textarea id="input" rows="5" placeholder="Écris ton message… (Entrée = envoyer, Maj+Entrée = saut de ligne)"></textarea>
+    <button id="btnSend" class="primary">Envoyer</button>
+  </div>
+</main>
+
+<div class="bottom-bar">
+  <div class="meter"><div class="meter-fill" id="ctxFill"></div></div>
+  <span class="bar-text" id="ctxText">ctx: —</span>
+  <span class="bar-text bar-dim" id="gpuText">GPU —</span>
+  <a href="config.html" target="_blank" class="cfgbtn">Config</a>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

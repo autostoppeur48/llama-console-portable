@@ -1,0 +1,13 @@
+{
+  "ctxSize": 131072,
+  "ngl": 99,
+  "cacheType": "q4_0",
+  "flashAttn": "on",
+  "batchSize": 4096,
+  "reasoningFormat": "deepseek",
+  "topK": -1,
+  "topP": 0.95,
+  "minP": 0.05,
+  "repeatPenalty": 1.0,
+  "repeatLastN": 64
+}

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Llama Console — Configuration serveur</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div class="brand">🦙 Llama Console — Configuration</div>
+  <div class="status"><span class="dot off" id="statusDot"></span><span id="statusText">hors ligne</span></div>
+  <a href="/" class="cfgbtn">← Chat</a>
+</header>
+
+<main class="config-main">
+  <div class="tabs">
+    <button class="tab active" data-tab="serveur">Serveur</button>
+    <button class="tab" data-tab="avance">Paramètres avancés</button>
+  </div>
+
+  <!-- ===== Onglet Serveur ===== -->
+  <div id="tab-serveur" class="tab-pane">
+    <section class="card">
+      <h2>Serveur llama.cpp</h2>
+      <div class="field">
+        <label>Modèle</label>
+        <div class="row-inline">
+          <select id="modelSel"></select>
+          <button id="refreshModels" class="mini" title="Relire les .gguf">↻</button>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label>Contexte</label><input id="ctxSize" type="number" min="1024" step="1024"></div>
+        <div class="field"><label>-ngl (couches GPU)</label><input id="ngl" type="number" min="0" step="1"></div>
+        <div class="field"><label>KV cache</label><select id="cacheType"><option>f16</option><option>q8_0</option><option>q4_0</option><option>q4_1</option><option>q5_0</option><option>q5_1</option></select></div>
+        <div class="field"><label>Port</label><input id="port" type="number" min="1024" max="65535"></div>
+        <div class="field"><label>Flash attention</label><select id="flashAttn"><option>on</option><option>off</option><option>auto</option></select></div>
+      </div>
+      <div class="field checkbox-field">
+        <label><input type="checkbox" id="gpuMonitoring" checked> Surveillance GPU (nvidia-smi) — décocher si pas de NVIDIA</label>
+      </div>
+      <div class="model-status">
+        <div class="meter"><div class="meter-fill" id="loadFill"></div></div>
+        <span class="mono" id="loadStatus">Aucun modèle chargé</span>
+      </div>
+      <div class="actions">
+        <button id="btnStart" class="primary">▶ Charger le modèle</button>
+        <button id="btnStop" class="danger">■ Décharger</button>
+        <button id="btnSaveCfg" class="ghost">Enregistrer config</button>
+        <button id="btnSaveProfile" class="ghost">💾 Profil du modèle</button>
+      </div>
+      <div class="msg" id="serverMsg"></div>
+      <div class="hint">Le serveur s'ouvre dans un terminal dédié : logs en direct, fermer la fenêtre = arrêter.</div>
+      <div class="hint" style="color:#4ade80;">🔒 Sécurité : lié à 127.0.0.1 (machine locale uniquement) + clé API auto-générée. Aucun accès distant possible.</div>
+    </section>
+
+    <section class="card">
+      <h2>Monitoring</h2>
+      <div class="meter-row">
+        <span>Contexte</span>
+        <div class="meter"><div class="meter-fill" id="ctxFill"></div></div>
+        <span class="mono" id="ctxVal">—</span>
+      </div>
+      <div class="kv">
+        <div><span class="k">Health</span><span class="v" id="healthVal">—</span></div>
+        <div><span class="k">Slot (n_prompt)</span><span class="v" id="slotVal">—</span></div>
+        <div><span class="k">GPU</span><span class="v" id="gpuVal">—</span></div>
+        <div><span class="k">VRAM</span><span class="v" id="vramVal">—</span></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ===== Onglet Avancé ===== -->
+  <div id="tab-avance" class="tab-pane" style="display:none">
+    <section class="card">
+      <h2>Performance (ligne de commande)</h2>
+      <div class="grid2">
+        <div class="field"><label>Threads CPU (0 = auto)</label><input id="threads" type="number" min="0" step="1"></div>
+        <div class="field"><label>Threads batch (-tb, -1 = auto)</label><input id="threadsBatch" type="number" min="-1" step="1"></div>
+        <div class="field"><label>Batch size (-b)</label><input id="batchSize" type="number" min="1" step="1"></div>
+        <div class="field"><label>Micro-batch (-ub)</label><input id="ubatchSize" type="number" min="1" step="1"></div>
+        <div class="field"><label>Main GPU (-1 = auto)</label><input id="mainGpu" type="number" min="-1" step="1"></div>
+        <div class="field"><label>N-keep (0 = auto)</label><input id="nKeep" type="number" min="0" step="1"></div>
+        <div class="field"><label>Timeout (s)</label><input id="timeout" type="number" min="1" step="1"></div>
+        <div class="field"><label>Tensor split (multi-GPU)</label><input id="tensorSplit" type="text" placeholder="ex: 24,24"></div>
+        <div class="field"><label>Split mode</label><select id="splitMode"><option value="">auto</option><option value="none">none</option><option value="layer">layer</option><option value="row">row</option></select></div>
+      </div>
+      <div class="field checkbox-field"><label><input type="checkbox" id="mmap" checked> mmap (chargement mappé en mémoire)</label></div>
+      <div class="field checkbox-field"><label><input type="checkbox" id="mlock"> mlock (verrouiller en RAM)</label></div>
+      <div class="field checkbox-field"><label><input type="checkbox" id="noKvOffload"> no-kv-offload (KV cache sur CPU)</label></div>
+      <div class="field checkbox-field"><label><input type="checkbox" id="warmup" checked> warmup (passe de chauffe au démarrage)</label></div>
+      <div class="hint">Ces réglages s'appliquent au prochain démarrage du serveur (▶ Démarrer).</div>
+    </section>
+
+    <section class="card">
+      <h2>Raisonnement (thinking)</h2>
+      <div class="grid2">
+        <div class="field">
+          <label>Thinking (--reasoning)</label>
+          <select id="reasoning"><option value="auto">auto</option><option value="on">on (toujours)</option><option value="off">off (jamais)</option></select>
+        </div>
+        <div class="field">
+          <label>Effort de réflexion (à chaud)</label>
+          <select id="reasoningEffort"><option value="">auto</option><option value="none">none</option><option value="low">low</option><option value="medium" selected>medium</option><option value="high">high</option><option value="xhigh">xhigh</option></select>
+        </div>
+        <div class="field">
+          <label>Budget de réflexion (tokens, -1 = illimité)</label>
+          <input id="reasoningBudget" type="number" min="-1" step="1">
+        </div>
+        <div class="field">
+          <label>Reasoning format</label>
+          <select id="reasoningFormat"><option value="">auto</option><option value="deepseek">deepseek</option><option value="none">none</option></select>
+        </div>
+      </div>
+      <div class="hint">« Effort » s'applique immédiatement (à chaud). Les autres (thinking, budget, format) au prochain démarrage (▶ Démarrer).</div>
+    </section>
+
+    <section class="card">
+      <h2>Échantillonnage (sampling)</h2>
+      <div class="grid2">
+        <div class="field"><label>Top-K (-1 = auto)</label><input id="topK" type="number" min="-1" step="1"></div>
+        <div class="field"><label>Top-P</label><input id="topP" type="number" min="0" max="1" step="0.01"></div>
+        <div class="field"><label>Min-P</label><input id="minP" type="number" min="0" max="1" step="0.01"></div>
+        <div class="field"><label>Typical-P (1 = off)</label><input id="typicalP" type="number" min="0" max="1" step="0.01"></div>
+        <div class="field"><label>Repeat penalty</label><input id="repeatPenalty" type="number" min="0" max="3" step="0.05"></div>
+        <div class="field"><label>Repeat last N</label><input id="repeatLastN" type="number" min="-1" step="1"></div>
+        <div class="field"><label>Presence penalty</label><input id="presencePenalty" type="number" min="-2" max="2" step="0.1"></div>
+        <div class="field"><label>Frequency penalty</label><input id="frequencyPenalty" type="number" min="-2" max="2" step="0.1"></div>
+        <div class="field"><label>Mirostat</label><select id="mirostat"><option value="0">off</option><option value="1">v1</option><option value="2">v2</option></select></div>
+        <div class="field"><label>Mirostat tau</label><input id="mirostatTau" type="number" min="0" max="20" step="0.1"></div>
+        <div class="field"><label>Mirostat eta</label><input id="mirostatEta" type="number" min="0" max="1" step="0.01"></div>
+        <div class="field"><label>Dynatemp range (0 = off)</label><input id="dynatempRange" type="number" min="0" max="2" step="0.1"></div>
+        <div class="field"><label>Dynatemp exponent</label><input id="dynatempExponent" type="number" min="0" max="10" step="0.1"></div>
+        <div class="field"><label>XTC probability (0 = off)</label><input id="xtcProbability" type="number" min="0" max="1" step="0.01"></div>
+        <div class="field"><label>XTC threshold</label><input id="xtcThreshold" type="number" min="0" max="1" step="0.01"></div>
+        <div class="field"><label>Seed (-1 = aléatoire)</label><input id="seed" type="number" min="-1" step="1"></div>
+      </div>
+      <div class="hint">Ces réglages s'appliquent aux réponses immédiatement (sans redémarrer).</div>
+    </section>
+  </div>
+</main>
+
+<script src="config.js"></script>
+</body>
+</html>

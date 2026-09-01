@@ -1,0 +1,28 @@
+# ── Runtimes lourds (→ zip portable en GitHub Release) ──
+backend/
+love/
+lua/
+
+# ── Modèles LLM (à télécharger séparément, jamais dans git) ──
+*.gguf
+*.gguf-sha256
+*.bin
+*.pt
+*.safetensors
+
+# ── Données de runtime (recréées au lancement) ──
+workspace/
+conversations/
+conversation.json
+backup/
+history/
+
+# ── Fichiers générés ──
+run-server.bat
+*.log
+
+# ── Système / éditeurs ──
+Thumbs.db
+.DS_Store
+desktop.ini
+node_modules/
