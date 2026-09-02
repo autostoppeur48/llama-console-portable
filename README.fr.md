@@ -26,7 +26,7 @@ pas de cloud, pas de compte, rien ne sort de ton PC.
   actuelles au-delà des connaissances du modèle.
 - **🖥️ Piloter ton propre serveur LLM** — choisir un modèle `.gguf`, régler la
   taille du contexte et les couches GPU, démarrer/arrêter, et surveiller en
-  direct l'occupation du contexte et les stats GPU.
+  direct l'occupation du contexte et les stats GPU. 100% configurable.
 
 ## 📦 100 % portable — zéro installation de la stack IA
 
