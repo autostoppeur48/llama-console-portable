@@ -1,235 +1,224 @@
 ==========================================================
- LLAMA CONSOLE — guide d'installation et d'utilisation
+ LLAMA CONSOLE — installation and usage guide
 ==========================================================
 
-Studio LLM local autonome : fait tourner un serveur llama.cpp
-+ un chat streaming. Tout est inclus dans ce dossier (moteur,
-modèles, interface) sauf deux choses : Node.js et un pilote GPU.
+Self-contained local LLM studio: runs a llama.cpp server
++ a streaming chat. Everything is included in this folder
+(engine, models, UI) except two things: Node.js and a GPU driver.
 
 ----------------------------------------------------------
- 1) À INSTALLER AVANT DE LANCER
+ 1) INSTALL BEFORE LAUNCHING
 ----------------------------------------------------------
 
- a) Node.js  (OBLIGATOIRE)
-    - Version 18 ou plus (testé avec la 24).
-    - Téléchargement : https://nodejs.org  (prendre la LTS)
-    - Vérifier : ouvrir un terminal et taper :  node --version
+ a) Node.js  (REQUIRED)
+    - Version 18 or later (tested with 24).
+    - Download: https://nodejs.org  (take the LTS)
+    - Check: open a terminal and type:  node --version
 
- b) Carte graphique NVIDIA + pilote  (recommandé)
-    - Le dossier backend\ embarque déjà le runtime CUDA 12 :
-      PAS besoin d'installer le CUDA Toolkit.
-    - Il faut seulement le PILOTE NVIDIA récent
-      (il fournit le composant nvcuda.dll).
-    - Sans NVIDIA : voir section 4 (CPU / AMD).
+ b) NVIDIA graphics card + driver  (recommended)
+    - The backend\ folder already bundles the CUDA 12 runtime:
+      NO need to install the CUDA Toolkit.
+    - You only need a recent NVIDIA DRIVER
+      (it provides the nvcuda.dll component).
+    - Without NVIDIA: see section 4 (CPU / AMD).
 
  c) Windows
-    - L'application est Windows uniquement (llama-server.exe).
+    - The app is Windows-only (llama-server.exe).
 
 ----------------------------------------------------------
- 2) DÉMARRAGE RAPIDE
+ 2) QUICK START
 ----------------------------------------------------------
 
- 1. Double-clic sur  start.bat
-    -> une console s'ouvre (interface web) et le navigateur
-       se lance sur  http://127.0.0.1:8787
- 2. Cliquer sur le bouton "Config" (en bas à droite de la page).
- 3. Cliquer sur "Démarrer (terminal)".
-    -> un terminal s'ouvre et charge le modèle (logs en direct).
- 4. Revenir sur la page principale et écrire dans la barre d'input.
+ 1. Double-click  start.bat
+    -> a console opens (web UI) and the browser
+       launches on  http://127.0.0.1:8787
+ 2. Click the "Config" button (bottom right of the page).
+ 3. Click "Load model (terminal)".
+    -> a terminal opens and loads the model (live logs).
+ 4. Go back to the main page and type in the input bar.
 
- Arrêt :
-   - Fermer le terminal llama.cpp  = arrête le serveur de modèle.
-   - Fermer la console start.bat   = arrête l'interface web.
-
-----------------------------------------------------------
- 3) PARAMÈTRES (page "Config" + ⚙ Paramètres)
-----------------------------------------------------------
-
- Valeurs par défaut = OPTIMISÉES pour Qwen3.8-27B (Q4_K_M) + RTX 3090
- 24 Go (testé sur cette config). Si ta machine diffère, adapte
- ci-dessous ou via la section 4.
-
- Paramètre            | Défaut    | Pour l'adapter
- ---------------------|-----------|-------------------------------------
- Modèle               | Qwen3.8...| .gguf présent dans models/
- Contexte             | 131072    | baisse si peu de RAM/VRAM (ex. 32768)
- -ngl (couches GPU)   | 99        | 99 = tout sur GPU ; 0 = tout sur CPU
- KV cache             | q4_0      | q4_0 = économe ; q8_0 = plus précis
- Port                 | 1235      | port du serveur llama.cpp
- Flash attention      | on        | CUDA uniquement ; "off" si CPU/AMD
- Surveillance GPU     | coché     | décocher si pas de NVIDIA
-
- Seuils du chat (page principale, ⚙ Paramètres) :
- max_tokens           | 8192      | longueur max d'une réponse (code non coupé)
- temperature          | 0.7       | 0 = déterministe, 2 = créatif
- Seuil compaction     | 80 %      | résume l'historique à ce % de contexte
-
- Onglet "Paramètres avancés" (page Config) :
- Performance (serveur, au prochain Démarrer) :
-   Threads CPU        | 0 (auto)  | -t
-   Threads batch      | -1 (auto) | -tb
-   Batch size         | 4096      | -b (rapide en 24 Go VRAM)
-   Micro-batch        | 512       | -ub
-   mmap               | coché     | chargement mappé en mémoire
-   mlock              | décoché   | verrouiller en RAM
-   Tensor split       | (vide)    | multi-GPU (ex: 24,24)
-   Split mode         | auto      | none/layer/row
-   Main GPU           | -1 (auto) | --main-gpu
-   no-kv-offload      | décoché   | KV cache sur CPU
-   warmup             | coché     | passe de chauffe
-   N-keep             | 0 (auto)  | --n-keep
-   Timeout            | 600 s     | --timeout
-   API key            | (vide)    | --api-key
- Raisonnement :
-   Reasoning format   | deepseek  | --reasoning-format (au prochain Démarrer)
-   Reasoning effort   | medium    | par requête : none/low/medium/high/xhigh
- Échantillonnage (immédiat, sans redémarrer) :
-   Top-K              | -1 (auto) | -1 = laisse le modèle décider
-   Top-P              | 0.95      | 0–1
-   Min-P              | 0.05      | 0–1
-   Typical-P          | 1 (off)   | 1 = désactivé
-   Repeat penalty     | 1.0       | 1 = neutre
-   Repeat last N      | 64        | fenêtre anti-répétition
-   Presence penalty   | 0.0       | -2 à 2
-   Frequency penalty  | 0.0       | -2 à 2
-   Mirostat           | off       | off/v1/v2
-   Mirostat tau       | 5.0       |
-   Mirostat eta       | 0.1       |
-   Dynatemp range     | 0 (off)   | température dynamique
-   Dynatemp exponent  | 1.0       |
-   XTC probability    | 0 (off)   | exclut les tokens probables
-   XTC threshold      | 0.1       |
-   Seed               | -1        | -1 = aléatoire ; fixe = reproductible
+ Shutdown:
+   - Closing the llama.cpp terminal = stops the model server.
+   - Closing the start.bat console = stops the web UI.
 
 ----------------------------------------------------------
- 4) CONFIGURATIONS ALTERNATIVES (sans NVIDIA)
+ 3) SETTINGS ("Config" page + ⚙ Settings)
 ----------------------------------------------------------
 
- CPU uniquement :
-   - Dans Config :  -ngl = 0 , Flash attention = "off",
-     décocher "Surveillance GPU".
-   - Contexte plus petit conseillé (16384 ou 32768) selon la RAM.
-   - Remplacer le contenu du dossier backend\ par un build CPU de
-     llama.cpp (nom du type : llama.cpp-win-x86_64-avx2, sans CUDA).
-     Le serveur utilisera ce moteur tel quel.
+ Default values = OPTIMIZED for Qwen3.8-27B (Q4_K_M) + RTX 3090
+ 24 GB (tested on this setup). If your machine differs, adjust
+ below or via section 4.
 
- AMD / Intel (Vulkan) :
-   - Même principe : remplacer backend\ par un build Vulkan de
-     llama.cpp (llama.cpp-win-x86_64-vulkan), -ngl adapté,
+ Setting               | Default   | To adjust
+ ----------------------|-----------|-------------------------------------
+ Model                 | Qwen3.8...| .gguf present in models/
+ Context               | 131072    | lower if little RAM/VRAM (e.g. 32768)
+ -ngl (GPU layers)     | 99        | 99 = all on GPU; 0 = all on CPU
+ KV cache              | q4_0      | q4_0 = frugal; q8_0 = more precise
+ Port                  | 1235      | llama.cpp server port
+ Flash attention       | on        | CUDA only; "off" for CPU/AMD
+ GPU monitoring        | checked   | uncheck if no NVIDIA
+
+ Chat thresholds (main page, ⚙ Settings):
+ max_tokens            | 16384     | max answer length (code not cut)
+ temperature           | 0.7       | 0 = deterministic, 2 = creative
+ Compaction threshold  | 80 %      | summarizes history at this % of context
+
+ "Advanced settings" tab (Config page):
+ Performance (server, at next Start):
+   CPU threads         | 0 (auto)  | -t
+   Batch threads       | -1 (auto) | -tb
+   Batch size          | 4096      | -b (fast in 24 GB VRAM)
+   Micro-batch         | 512       | -ub
+   mmap                | checked   | memory-mapped loading
+   mlock               | unchecked | lock in RAM
+   Tensor split        | (empty)   | multi-GPU (e.g. 24,24)
+   Split mode          | auto      | none/layer/row
+   Main GPU            | -1 (auto) | --main-gpu
+   no-kv-offload       | unchecked | KV cache on CPU
+   warmup              | checked   | warm-up pass
+   N-keep              | 0 (auto)  | --n-keep
+   Timeout             | 600 s     | --timeout
+   API key             | (empty)   | --api-key
+ Reasoning:
+   Reasoning format    | deepseek  | --reasoning-format (at next Start)
+   Reasoning effort    | medium    | per request: none/low/medium/high/xhigh
+ Sampling (immediate, no restart):
+   Top-K               | -1 (auto) | -1 = let the model decide
+   Top-P               | 0.95      | 0-1
+   Min-P               | 0.05      | 0-1
+   Typical-P           | 1 (off)   | 1 = disabled
+   Repeat penalty      | 1.0       | 1 = neutral
+   Repeat last N       | 64        | anti-repetition window
+   Presence penalty    | 0.0       | -2 to 2
+   Frequency penalty   | 0.0       | -2 to 2
+   Mirostat            | off       | off/v1/v2
+   Mirostat tau        | 5.0       |
+   Mirostat eta        | 0.1       |
+   Dynatemp range      | 0 (off)   | dynamic temperature
+   Dynatemp exponent   | 1.0       |
+   XTC probability     | 0 (off)   | excludes likely tokens
+   XTC threshold       | 0.1       |
+   Seed                | -1        | -1 = random; fixed = reproducible
+
+----------------------------------------------------------
+ 4) ALTERNATIVE SETUPS (without NVIDIA)
+----------------------------------------------------------
+
+ CPU only:
+   - In Config: -ngl = 0, Flash attention = "off",
+     uncheck "GPU monitoring".
+   - Smaller context recommended (16384 or 32768) depending on RAM.
+   - Replace the content of the backend\ folder with a CPU build of
+     llama.cpp (name like: llama.cpp-win-x86_64-avx2, no CUDA).
+     The server will use that engine as-is.
+
+ AMD / Intel (Vulkan):
+   - Same idea: replace backend\ with a Vulkan build of
+     llama.cpp (llama.cpp-win-x86_64-vulkan), adjusted -ngl,
      Flash attention = "off".
 
- Les modèles restent les mêmes (dossier models/), aucun changement.
+ The models stay the same (models/ folder), no change needed.
 
 ----------------------------------------------------------
- 5) CONTENU DU DOSSIER
+ 5) FOLDER CONTENTS
 ----------------------------------------------------------
 
- backend\     llama-server.exe + DLLs (CUDA, MSVC, OpenMP)  <- moteur
- models\      les .gguf                                     <- modèles
- server.js    serveur web + proxy chat
- public\      l'interface (pages + scripts)
- config.json  réglages (chemins + paramètres)
- start.bat    lanceur double-clic
- readme.txt   ce guide
+ backend\     llama-server.exe + DLLs (CUDA, MSVC, OpenMP)  <- engine
+ models\      the .gguf                                     <- models
+ server.js    web server + chat proxy
+ public\      the UI (pages + scripts)
+ config.json  settings (paths + parameters)
+ start.bat    double-click launcher
+ readme.txt   this guide
 
- Taille totale : ~20 Go (surtout les modèles).
-
-----------------------------------------------------------
- 6) DÉPANNAGE
-----------------------------------------------------------
-
- - "node n'est pas reconnu"  -> Node.js absent (section 1a).
- - Le terminal llama s'ouvre puis se ferme aussitôt
-   -> lire llama-server.log (à la racine).
- - Réponse lente ou erreur de mémoire vidéo
-   -> baisser "Contexte" ou mettre KV cache = q4_0.
- - GPU affiché "—"  -> pilote NVIDIA absent, ou décocher/cocher
-   "Surveillance GPU".
+ Total size: ~20 GB (mostly the models).
 
 ----------------------------------------------------------
- 7) SÉCURITÉ (100 % local)
+ 6) TROUBLESHOOTING
 ----------------------------------------------------------
 
- Ce projet est conçu pour tourner UNIQUEMENT sur la machine
- locale. Aucune connexion distante n'est possible :
-
- - Le serveur llama.cpp est lancé avec --host 127.0.0.1
-   (boucle locale uniquement, pas 0.0.0.0) -> injoignable
-   depuis le réseau / internet.
-
- - L'interface web écoute sur 127.0.0.1:8787 uniquement.
-
- - Une clé API est générée automatiquement et stockée dans
-   config.json. L'inférence (/v1/chat/completions) et /slots
-   refusent tout accès sans cette clé (401) -> un site web
-   malveillant ou un processus externe ne peut pas utiliser
-   le modèle.
-
- - Le proxy (server.js) transmet la clé en interne ; elle
-   n'est jamais exposée au navigateur.
-
- Note : /health et /v1/models restent publics (simple statut),
- mais ils ne donnent accès à rien de sensible et restent
- confinés à la machine locale.
+ - "node is not recognized"  -> Node.js missing (section 1a).
+ - The llama terminal opens then closes immediately
+   -> read llama-server.log (at the root).
+ - Slow answer or video memory error
+   -> lower "Context" or set KV cache = q4_0.
+ - GPU shown as "—"  -> NVIDIA driver missing, or uncheck/check
+   "GPU monitoring".
 
 ----------------------------------------------------------
- 8) MODE AGENT (l'agent de code local)
+ 7) SECURITY (100 % local)
 ----------------------------------------------------------
 
- Le "🤖 Mode Agent" (au-dessus de la barre d'input) est coché
- par défaut : le modèle peut AGIR dans un dossier workspace/
- (créé à la racine du projet) :
+ This project is designed to run ONLY on the local machine.
+ No remote connection is possible:
 
-   - lister / lire / rechercher (grep) . automatique
-   - trouver des fichiers (glob) ........ automatique
-   - écrire / modifier / remplacer tout . automatique
-   - déplacer / renommer (move_file) .... automatique
-   - supprimer un fichier (delete_file) . demande approbation
-   - plan d'étapes (set_plan) ........... automatique
-     (il liste ses étapes et les coche en direct)
-   - tester le jeu (run_love) ........... automatique
-     (lance LÖVE, récupère love.err.log / love.out.log)
-   - vérifier la syntaxe Lua (check_lua) . automatique
-   - shell (persistant) ................. demande approbation
-     (cd/variables conservés ; commandes de vérification :
-      node --check, git status, etc. = automatiques)
+ - The llama.cpp server is launched with --host 127.0.0.1
+   (local loopback only, not 0.0.0.0) -> unreachable
+   from the network / internet.
 
-  Pour run_love, le serveur trouve LÖVE tout seul (auto-détection) :
-  1) un dossier love\ dans le projet (portable, comme backend\)
-  2) les emplacements standard (C:\Program Files\LOVE\love.exe...)
-  3) sinon la commande "love" sur le PATH.
-  Tu peux forcer un chemin via le champ "loveCmd" dans Config
-  (utile seulement si LÖVE est ailleurs).
+ - The web UI listens on 127.0.0.1:8787 only.
 
- Approuver / Refuser : des boutons apparaissent dans le chat
- quand une action attend ton feu vert.
+ - An API key is generated automatically and stored in
+   config.json. Inference (/v1/chat/completions) and /slots
+   refuse any access without this key (401) -> a malicious
+   website or external process cannot use the model.
 
- "⚡ Auto-approuver" : coche cette case pour que les commandes
- shell s'exécutent aussi sans demander.
+ - The proxy (server.js) passes the key internally; it is
+   never exposed to the browser.
 
- "📋 Mode plan" : coche cette case pour que l'agent PROPOSE un
- plan (lecture seule) et attende ton approbation AVANT d'écrire
- ou d'exécuter quoi que ce soit. Boutons "Approuver"/"Modifier".
+ Note: /health and /v1/models stay public (simple status),
+ but they give access to nothing sensitive and remain
+ confined to the local machine.
 
- Sécurité : l'agent est CONFINÉ à workspace/ (chemins absolus
- et ".." sont refusés). Il ne touche pas au reste de la machine,
- sauf via une commande shell que tu as toi-même approuvée.
+----------------------------------------------------------
+ 8) AGENT MODE (the local coding agent)
+----------------------------------------------------------
 
- Sauvegarde : à CHAQUE tâche, le serveur copie automatiquement
- tout workspace/ dans backup/<date-heure> (20 sauvegardes max).
- Si l'agent casse un fichier, retrouve-le dans ce dossier.
- L'agent ne peut pas y toucher (hors de workspace/).
+ The "🤖 Agent mode" (above the input bar) is checked
+ by default: the model can ACT inside a workspace/ folder
+ (created at the project root):
 
- Trace (option "🔍 Tracer les modifs") : à chaque modification
- d'un fichier CODE (.lua, .js, .py, .json...), le serveur garde
- l'ancienne version dans history/<date-heure>/nom.<date-heure>.
- Historique précis, jamais de fichiers lourds/binaires.
+   - list / read / search (grep) ......... automatic
+   - find files (glob) .................... automatic
+   - write / edit / replace anything ...... automatic
+   - move / rename (move_file) ............ automatic
+   - delete a file (delete_file) .......... asks approval
+   - step plan (set_plan) ................. automatic
+     (it lists its steps and ticks them live)
+   - shell (persistent) ................... asks approval
+     (cd/variables kept; verification commands:
+      node --check, git status, etc. = automatic)
 
- Mémoire : l'agent lit automatiquement workspace/AGENTS.md au
- démarrage (tes règles et conventions) et peut le mettre à jour
- pour s'en souvenir aux prochaines sessions.
+ Approve / Reject: buttons appear in the chat when an action
+ waits for your go-ahead.
 
- Conseil : pour du code, laisse le modèle vérifier lui-même
- (node --check, luac -p) avant de te rendre le résultat — c'est
- ce qui évite les erreurs de casse type love.keyboard.isDown.
+ "⚡ Auto-approve": check this box so shell commands
+ also run without asking.
 
+ "📋 Plan mode": check this box so the agent PROPOSES a
+ plan (read-only) and waits for your approval BEFORE writing
+ or executing anything. "Approve"/"Edit" buttons.
+
+ Security: the agent is CONFINED to workspace/ (absolute paths
+ and ".." are refused). It does not touch the rest of the
+ machine, except through a shell command that you approved
+ yourself.
+
+ Backup: at EACH task, the server automatically copies the
+ whole workspace/ into backup/<date-time> (20 backups max).
+ If the agent breaks a file, find it in that folder.
+ The agent cannot touch it (outside workspace/).
+
+ Tracing ("🔍 Trace changes" option): at every modification of
+ a CODE file (.js, .py, .json...), the server keeps the old
+ version in history/<date-time>/name.<date-time>.
+ Precise history, never heavy/binary files.
+
+ Memory: the agent automatically reads workspace/AGENTS.md at
+ startup (your rules and conventions) and may update it to
+ remember them for future sessions.
+
+ Tip: for code, let the model verify itself
+ (node --check) before returning the result to you — that is
+ what avoids case-sensitivity bugs.

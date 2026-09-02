@@ -6,7 +6,7 @@ const $ = (id) => document.getElementById(id)
 
 function fmt(n) {
   const x = Number(n)
-  return Number.isFinite(x) ? x.toLocaleString('fr-FR') : '—'
+  return Number.isFinite(x) ? x.toLocaleString('en-US') : '—'
 }
 
 async function api(path, opts) {
@@ -62,7 +62,7 @@ function renderHistory() {
   for (const m of messages) {
     addBubble(m.role === 'assistant' ? 'assistant' : 'user', escapeHtml(m.content))
   }
-  if (compactionSummary) appendNotice('🧹 Résumé de contexte conservé (historique allégé).')
+  if (compactionSummary) appendNotice('🧹 Context summary kept (history slimmed down).')
 }
 
 function restoreConversation(data) {
@@ -105,7 +105,7 @@ function appendNotice(text) {
 function addBubble(role, html) {
   const div = document.createElement('div')
   div.className = 'bubble ' + role
-  div.innerHTML = '<span class="role">' + (role === 'assistant' ? 'Assistant' : 'Vous') + '</span>' + html
+  div.innerHTML = '<span class="role">' + (role === 'assistant' ? 'Assistant' : 'You') + '</span>' + html
   $('messages').appendChild(div)
   scrollDown()
   return div
@@ -156,7 +156,7 @@ async function sendMessage() {
   pendingResume = false
   input.value = ''
   abortController = new AbortController()
-  $('btnSend').textContent = '■ Arrêter'
+  $('btnSend').textContent = '■ Stop'
   $('btnSend').disabled = false
 
   addUser(text)
@@ -174,7 +174,7 @@ async function resumeGeneration() {
   streaming = true
   pendingResume = false
   abortController = new AbortController()
-  $('btnSend').textContent = '■ Arrêter'
+  $('btnSend').textContent = '■ Stop'
   $('btnSend').disabled = false
 
   if (partialAnswer) {
@@ -197,7 +197,7 @@ async function generateResponse() {
   const parser = makeThinkParser()
   const thinkEl = document.createElement('details')
   thinkEl.className = 'think'
-  thinkEl.innerHTML = '<summary>💭 Raisonnement</summary><div class="think-body"></div>'
+  thinkEl.innerHTML = '<summary>💭 Reasoning</summary><div class="think-body"></div>'
   thinkEl.style.display = 'none'
   const answerEl = document.createElement('div')
   answerEl.className = 'answer'
@@ -209,7 +209,7 @@ async function generateResponse() {
   const systemParts = []
   if (baseSystem) systemParts.push(baseSystem)
   if (compactionSummary) {
-    systemParts.push('[Contexte résumé de la discussion précédente]\n' + compactionSummary)
+    systemParts.push('[Summary of the previous discussion context]\n' + compactionSummary)
   }
   const payload = {
     messages,
@@ -234,8 +234,8 @@ async function generateResponse() {
     if (!resp.ok || !resp.body) {
       const err = await resp.text()
       answerEl.classList.remove('cursor')
-      answerEl.textContent = '⚠ Erreur : ' + (err || resp.status)
-      $('btnSend').textContent = 'Envoyer'
+      answerEl.textContent = '⚠ Error: ' + (err || resp.status)
+      $('btnSend').textContent = 'Send'
       return
     }
 
@@ -283,25 +283,25 @@ async function generateResponse() {
       // Reponse tronquee (max_tokens atteint) : proposer Reprendre.
       partialAnswer = fullAnswer.trim()
       pendingResume = true
-      appendNotice('⚠ Réponse tronquée (max_tokens atteint) — clique ▶ Reprendre pour continuer.')
-      $('btnSend').textContent = '▶ Reprendre'
+      appendNotice('⚠ Response truncated (max_tokens reached) — click ▶ Resume to continue.')
+      $('btnSend').textContent = '▶ Resume'
     } else {
-      if (fullAnswer.trim().length === 0) answerEl.textContent = '(réponse vide)'
-      messages.push({ role: 'assistant', content: fullAnswer.trim() || '(vide)' })
+      if (fullAnswer.trim().length === 0) answerEl.textContent = '(empty response)'
+      messages.push({ role: 'assistant', content: fullAnswer.trim() || '(empty)' })
       persistChat()
-      $('btnSend').textContent = 'Envoyer'
+      $('btnSend').textContent = 'Send'
     }
   } catch (e) {
     answerEl.classList.remove('cursor')
     if (e && e.name === 'AbortError') {
       partialAnswer = fullAnswer.trim()
       pendingResume = true
-      if (partialAnswer.length === 0) answerEl.textContent = '(génération arrêtée)'
-      appendNotice('⏹ Génération arrêtée.')
-      $('btnSend').textContent = '▶ Reprendre'
+      if (partialAnswer.length === 0) answerEl.textContent = '(generation stopped)'
+      appendNotice('⏹ Generation stopped.')
+      $('btnSend').textContent = '▶ Resume'
     } else {
-      answerEl.textContent = '⚠ Erreur réseau : ' + (e.message || e)
-      $('btnSend').textContent = 'Envoyer'
+      answerEl.textContent = '⚠ Network error: ' + (e.message || e)
+      $('btnSend').textContent = 'Send'
     }
   } finally {
     streaming = false
@@ -325,12 +325,12 @@ function stopGeneration() {
 async function runCompact() {
   if (compactionRunning || streaming) return
   if (messages.length < 2) {
-    appendNotice('🧹 Rien à compacter (conversation trop courte).')
+    appendNotice('🧹 Nothing to compact (conversation too short).')
     return
   }
   compactionRunning = true
   pendingSinceCompact = false
-  appendNotice('🧹 Compaction en cours… (peut prendre ~30 s à 1 min selon la taille)')
+  appendNotice('🧹 Compacting… (may take ~30 s to 1 min depending on size)')
   try {
     const r = await fetch('/api/compact', {
       method: 'POST',
@@ -349,13 +349,13 @@ async function runCompact() {
         return c.length > 3000 ? { ...m, content: c.slice(-3000) } : m
       })
       persistChat()
-      appendNotice('✅ Compaction OK : ' + oldLen + ' messages → résumé + ' + messages.length + ' récents.')
+      appendNotice('✅ Compaction OK: ' + oldLen + ' messages → summary + ' + messages.length + ' recent.')
     } else {
-      appendNotice('⚠ Compaction échouée : ' + (d.error || 'réponse vide'))
+      appendNotice('⚠ Compaction failed: ' + (d.error || 'empty response'))
       pendingSinceCompact = true
     }
   } catch (e) {
-    appendNotice('⚠ Compaction : erreur ' + (e.message || e))
+    appendNotice('⚠ Compaction: error ' + (e.message || e))
     pendingSinceCompact = true
   } finally {
     compactionRunning = false
@@ -437,13 +437,13 @@ function handleAgentEvent(ev, journal, answerEl, thinkEl, planEl) {
       break
     }
     case 'approval': {
-      const card = appendAgentLine(journal, 'approval', '🔐 Approbation : ' + ev.summary)
+      const card = appendAgentLine(journal, 'approval', '🔐 Approval: ' + ev.summary)
       const btns = document.createElement('div')
       btns.className = 'approval-btns'
       const ok = document.createElement('button')
-      ok.textContent = '✅ Approuver'
+      ok.textContent = '✅ Approve'
       const no = document.createElement('button')
-      no.textContent = '❌ Refuser'
+      no.textContent = '❌ Reject'
       ok.addEventListener('click', () => sendApproval(true))
       no.addEventListener('click', () => sendApproval(false))
       btns.appendChild(ok)
@@ -452,24 +452,24 @@ function handleAgentEvent(ev, journal, answerEl, thinkEl, planEl) {
       break
     }
     case 'plan_proposal': {
-      const card = appendAgentLine(journal, 'approval', '📋 Plan proposé :')
+      const card = appendAgentLine(journal, 'approval', '📋 Proposed plan:')
       const pre = document.createElement('pre')
       pre.textContent = ev.plan || ''
       card.appendChild(pre)
       const btns = document.createElement('div')
       btns.className = 'approval-btns'
       const ok = document.createElement('button')
-      ok.textContent = '✅ Approuver le plan'
+      ok.textContent = '✅ Approve plan'
       ok.addEventListener('click', () => sendApproval(true))
       const edit = document.createElement('button')
-      edit.textContent = '✏️ Modifier'
+      edit.textContent = '✏️ Edit'
       const feed = document.createElement('textarea')
       feed.className = 'plan-feedback'
-      feed.placeholder = 'Tes remarques sur le plan…'
+      feed.placeholder = 'Your comments on the plan…'
       feed.rows = 2
       feed.style.display = 'none'
       const send = document.createElement('button')
-      send.textContent = 'Envoyer les remarques'
+      send.textContent = 'Send comments'
       send.style.display = 'none'
       edit.addEventListener('click', () => {
         feed.style.display = 'block'
@@ -488,12 +488,12 @@ function handleAgentEvent(ev, journal, answerEl, thinkEl, planEl) {
     case 'changes': {
       const list = Array.isArray(ev.changes) ? ev.changes : []
       const n = list.length
-      const card = appendAgentLine(journal, 'approval', '📊 Diff des modifications (' + n + ' fichier' + (n > 1 ? 's' : '') + ')')
+      const card = appendAgentLine(journal, 'approval', '📊 File changes diff (' + n + ' file' + (n > 1 ? 's' : '') + ')')
       for (const ch of list) {
         const head = document.createElement('div')
         head.className = 'diff-head'
         const icon = ch.status === 'added' ? '➕' : ch.status === 'deleted' ? '➖' : '✏️'
-        const label = ch.status === 'added' ? 'ajouté' : ch.status === 'deleted' ? 'supprimé' : (ch.binary ? 'modifié (binaire)' : 'modifié')
+        const label = ch.status === 'added' ? 'added' : ch.status === 'deleted' ? 'deleted' : (ch.binary ? 'modified (binary)' : 'modified')
         head.textContent = icon + ' ' + ch.rel + ' — ' + label
         card.appendChild(head)
         if (ch.diff) {
@@ -507,7 +507,7 @@ function handleAgentEvent(ev, journal, answerEl, thinkEl, planEl) {
         const btns = document.createElement('div')
         btns.className = 'approval-btns'
         const undo = document.createElement('button')
-        undo.textContent = '↩️ Annuler les modifications'
+        undo.textContent = '↩️ Undo changes'
         undo.addEventListener('click', () => undoChanges(ev.backup, undo))
         btns.appendChild(undo)
         card.appendChild(btns)
@@ -525,7 +525,7 @@ function handleAgentEvent(ev, journal, answerEl, thinkEl, planEl) {
       }
       break
     case 'error':
-      answerEl.textContent = '⚠ Erreur agent : ' + (ev.message || '')
+      answerEl.textContent = '⚠ Agent error: ' + (ev.message || '')
       break
   }
   scrollDown()
@@ -546,7 +546,7 @@ function sendPlanFeedback(feedback) {
   api('/api/agent/approve', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ runId: agentRunId, approve: false, feedback: feedback || 'Plan à revoir' }),
+    body: JSON.stringify({ runId: agentRunId, approve: false, feedback: feedback || 'Plan needs review' }),
   }).catch(() => {})
   document.querySelectorAll('.approval-btns button, .plan-feedback').forEach((b) => { b.disabled = true })
 }
@@ -569,10 +569,10 @@ async function undoChanges(name, btn) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ backup: name }),
     })
-    if (r && r.ok) appendNotice('↩️ Modifications annulées — workspace restauré depuis backup/' + name + '.')
-    else appendNotice('⚠ Annulation impossible : ' + ((r && r.error) || 'erreur inconnue'))
+    if (r && r.ok) appendNotice('↩️ Changes undone — workspace restored from backup/' + name + '.')
+    else appendNotice('⚠ Undo failed: ' + ((r && r.error) || 'unknown error'))
   } catch (e) {
-    appendNotice('⚠ Annulation impossible : ' + (e.message || e))
+    appendNotice('⚠ Undo failed: ' + (e.message || e))
   }
 }
 
@@ -587,7 +587,7 @@ async function runAgent() {
   bubble.appendChild(journal)
   const thinkEl = document.createElement('details')
   thinkEl.className = 'think'
-  thinkEl.innerHTML = '<summary>💭 Raisonnement</summary><div class="think-body"></div>'
+  thinkEl.innerHTML = '<summary>💭 Reasoning</summary><div class="think-body"></div>'
   thinkEl.style.display = 'none'
   bubble.appendChild(thinkEl)
   const answerEl = document.createElement('div')
@@ -605,8 +605,8 @@ async function runAgent() {
       signal: abortController.signal,
     })
     if (!resp.ok || !resp.body) {
-      answerEl.textContent = '⚠ Erreur : ' + resp.status
-      $('btnSend').textContent = 'Envoyer'
+      answerEl.textContent = '⚠ Error: ' + resp.status
+      $('btnSend').textContent = 'Send'
       return
     }
     const reader = resp.body.getReader()
@@ -632,14 +632,14 @@ async function runAgent() {
     }
   } catch (e) {
     if (e && e.name === 'AbortError') {
-      appendNotice('⏹ Agent arrêté.')
+      appendNotice('⏹ Agent stopped.')
     } else {
-      answerEl.textContent = '⚠ Erreur : ' + (e.message || e)
+      answerEl.textContent = '⚠ Error: ' + (e.message || e)
     }
   } finally {
     streaming = false
     abortController = null
-    $('btnSend').textContent = 'Envoyer'
+    $('btnSend').textContent = 'Send'
     $('btnSend').disabled = false
     const inp = $('input')
     if (inp) inp.focus()
@@ -657,7 +657,7 @@ async function refreshBar() {
     const dot = $('statusDot')
     const txt = $('statusText')
     dot.className = 'dot ' + (s.running ? 'on' : s.starting ? 'loading' : 'off')
-    txt.textContent = s.running ? 'en ligne' : s.starting ? 'chargement…' : 'hors ligne'
+    txt.textContent = s.running ? 'online' : s.starting ? 'loading…' : 'offline'
 
     const slots = s.slots
     let ctx = 0
@@ -683,8 +683,8 @@ async function refreshBar() {
     const cs = $('compactStatus')
     if (cs) {
       cs.textContent = lastCompactAt
-        ? 'Seuil compaction : ' + compactPct + '% (' + fmt(threshold) + ' tok) · dernière : ' + lastCompactAt.toLocaleTimeString('fr-FR')
-        : 'Seuil compaction : ' + compactPct + '% (' + fmt(threshold) + ' tok)'
+        ? 'Compaction threshold: ' + compactPct + '% (' + fmt(threshold) + ' tok) · last: ' + lastCompactAt.toLocaleTimeString('en-US')
+        : 'Compaction threshold: ' + compactPct + '% (' + fmt(threshold) + ' tok)'
     }
     if (!streaming && !compactionRunning && pendingSinceCompact && ctx >= threshold && messages.length >= 4) {
       runCompact()
@@ -716,7 +716,7 @@ function saveChatConfig() {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      maxTokens: Number($('maxTokens').value) || 8192,
+      maxTokens: Number($('maxTokens').value) || 16384,
       temperature: Number($('temperature').value) || 0.7,
       systemPrompt: $('systemPrompt').value,
       compactPct: Number($('compactPct').value) || 80,

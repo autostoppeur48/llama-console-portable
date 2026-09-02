@@ -6,7 +6,7 @@ const $ = (id) => document.getElementById(id)
 
 function fmt(n) {
   const x = Number(n)
-  return Number.isFinite(x) ? x.toLocaleString('fr-FR') : '—'
+  return Number.isFinite(x) ? x.toLocaleString('en-US') : '—'
 }
 
 async function api(path, opts) {
@@ -146,27 +146,27 @@ async function loadProfileForModel(model) {
     const d = await api('/api/model-profile?model=' + encodeURIComponent(model))
     if (d && d.profile) {
       applyProfile(d.profile)
-      setMsg('Profil chargé pour ' + model, false)
+      setMsg('Profile loaded for ' + model, false)
     } else {
-      setMsg('Aucun profil pour ce modèle (valeurs globales utilisées)', false)
+      setMsg('No profile for this model (global values used)', false)
     }
   } catch (e) { /* ignore */ }
 }
 
 async function saveProfile() {
   const model = $('modelSel').value
-  if (!model) { setMsg("Sélectionne d'abord un modèle", true); return }
-  setMsg('Enregistrement du profil…')
+  if (!model) { setMsg("Select a model first", true); return }
+  setMsg('Saving profile…')
   try {
     const d = await api('/api/model-profile', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(collectConfig()),
     })
-    if (d.result === 'ok') setMsg('Profil enregistré → ' + model + '.json', false)
-    else setMsg(d.result || 'Erreur', true)
+    if (d.result === 'ok') setMsg('Profile saved → ' + model + '.json', false)
+    else setMsg(d.result || 'Error', true)
   } catch (e) {
-    setMsg('Erreur : ' + (e.message || e), true)
+    setMsg('Error: ' + (e.message || e), true)
   }
 }
 
@@ -174,7 +174,7 @@ async function saveProfile() {
 
 async function startServer() {
   $('btnStart').disabled = true
-  setMsg('Application de la config + ouverture du terminal…')
+  setMsg('Applying config + opening terminal…')
   try {
     await api('/api/config', {
       method: 'POST',
@@ -182,10 +182,10 @@ async function startServer() {
       body: JSON.stringify(collectConfig()),
     })
     const d = await api('/api/server/start', { method: 'POST' })
-    if (d.ok) setMsg('Terminal ouvert — chargement du modèle… (regarde la fenêtre console)')
-    else setMsg('Erreur : ' + (d.error || 'inconnue'), true)
+    if (d.ok) setMsg('Terminal opened — loading model… (watch the console window)')
+    else setMsg('Error: ' + (d.error || 'unknown'), true)
   } catch (e) {
-    setMsg('Erreur : ' + (e.message || e), true)
+    setMsg('Error: ' + (e.message || e), true)
   } finally {
     $('btnStart').disabled = false
     refresh()
@@ -193,29 +193,29 @@ async function startServer() {
 }
 
 async function stopServer() {
-  setMsg('Arrêt du serveur…')
+  setMsg('Stopping server…')
   try {
     const d = await api('/api/server/stop', { method: 'POST' })
-    setMsg(d.ok ? 'Serveur arrêté.' : 'Arrêt demandé (ferme aussi la fenêtre console).')
+    setMsg(d.ok ? 'Server stopped.' : 'Stop requested (also closes the console window).')
   } catch (e) {
-    setMsg('Erreur : ' + (e.message || e), true)
+    setMsg('Error: ' + (e.message || e), true)
   } finally {
     refresh()
   }
 }
 
 async function saveConfig() {
-  setMsg('Enregistrement…')
+  setMsg('Saving…')
   try {
     const d = await api('/api/config', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(collectConfig()),
     })
-    if (d.result === 'ok') setMsg('Config enregistrée.')
-    else setMsg(d.result || 'Erreur', true)
+    if (d.result === 'ok') setMsg('Config saved.')
+    else setMsg(d.result || 'Error', true)
   } catch (e) {
-    setMsg('Erreur : ' + (e.message || e), true)
+    setMsg('Error: ' + (e.message || e), true)
   }
 }
 
@@ -230,7 +230,7 @@ async function refresh() {
     const dot = $('statusDot')
     const txt = $('statusText')
     dot.className = 'dot ' + (s.running ? 'on' : s.starting ? 'loading' : 'off')
-    txt.textContent = s.running ? 'en ligne' : s.starting ? 'chargement…' : 'hors ligne'
+    txt.textContent = s.running ? 'online' : s.starting ? 'loading…' : 'offline'
 
     // Statut du modèle (chargement / chargé / aucun)
     const loadFill = $('loadFill')
@@ -238,15 +238,15 @@ async function refresh() {
     if (s.running) {
       loadFill.style.width = '100%'
       loadFill.className = 'meter-fill'
-      loadStatus.textContent = 'Modèle chargé : ' + (d.config && d.config.model ? d.config.model : '')
+      loadStatus.textContent = 'Model loaded: ' + (d.config && d.config.model ? d.config.model : '')
     } else if (s.starting) {
       const elapsed = s.startedAt ? Math.round((Date.now() - new Date(s.startedAt).getTime()) / 1000) : 0
       loadFill.className = 'meter-fill loading'
-      loadStatus.textContent = 'Chargement de ' + (s.loadingModel || (d.config && d.config.model) || '') + '… (' + elapsed + ' s)'
+      loadStatus.textContent = 'Loading ' + (s.loadingModel || (d.config && d.config.model) || '') + '… (' + elapsed + ' s)'
     } else {
       loadFill.style.width = '0%'
       loadFill.className = 'meter-fill'
-      loadStatus.textContent = 'Aucun modèle chargé'
+      loadStatus.textContent = 'No model loaded'
     }
 
     const slots = s.slots

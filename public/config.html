@@ -1,64 +1,64 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Llama Console — Configuration serveur</title>
+<title>Llama Console — Server configuration</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header>
   <div class="brand">🦙 Llama Console — Configuration</div>
-  <div class="status"><span class="dot off" id="statusDot"></span><span id="statusText">hors ligne</span></div>
+  <div class="status"><span class="dot off" id="statusDot"></span><span id="statusText">offline</span></div>
   <a href="/" class="cfgbtn">← Chat</a>
 </header>
 
 <main class="config-main">
   <div class="tabs">
-    <button class="tab active" data-tab="serveur">Serveur</button>
-    <button class="tab" data-tab="avance">Paramètres avancés</button>
+    <button class="tab active" data-tab="serveur">Server</button>
+    <button class="tab" data-tab="avance">Advanced settings</button>
   </div>
 
-  <!-- ===== Onglet Serveur ===== -->
+  <!-- ===== Server tab ===== -->
   <div id="tab-serveur" class="tab-pane">
     <section class="card">
-      <h2>Serveur llama.cpp</h2>
+      <h2>llama.cpp server</h2>
       <div class="field">
-        <label>Modèle</label>
+        <label>Model</label>
         <div class="row-inline">
           <select id="modelSel"></select>
-          <button id="refreshModels" class="mini" title="Relire les .gguf">↻</button>
+          <button id="refreshModels" class="mini" title="Rescan .gguf files">↻</button>
         </div>
       </div>
       <div class="grid2">
-        <div class="field"><label>Contexte</label><input id="ctxSize" type="number" min="1024" step="1024"></div>
-        <div class="field"><label>-ngl (couches GPU)</label><input id="ngl" type="number" min="0" step="1"></div>
+        <div class="field"><label>Context</label><input id="ctxSize" type="number" min="1024" step="1024"></div>
+        <div class="field"><label>-ngl (GPU layers)</label><input id="ngl" type="number" min="0" step="1"></div>
         <div class="field"><label>KV cache</label><select id="cacheType"><option>f16</option><option>q8_0</option><option>q4_0</option><option>q4_1</option><option>q5_0</option><option>q5_1</option></select></div>
         <div class="field"><label>Port</label><input id="port" type="number" min="1024" max="65535"></div>
         <div class="field"><label>Flash attention</label><select id="flashAttn"><option>on</option><option>off</option><option>auto</option></select></div>
       </div>
       <div class="field checkbox-field">
-        <label><input type="checkbox" id="gpuMonitoring" checked> Surveillance GPU (nvidia-smi) — décocher si pas de NVIDIA</label>
+        <label><input type="checkbox" id="gpuMonitoring" checked> GPU monitoring (nvidia-smi) — uncheck if no NVIDIA</label>
       </div>
       <div class="model-status">
         <div class="meter"><div class="meter-fill" id="loadFill"></div></div>
-        <span class="mono" id="loadStatus">Aucun modèle chargé</span>
+        <span class="mono" id="loadStatus">No model loaded</span>
       </div>
       <div class="actions">
-        <button id="btnStart" class="primary">▶ Charger le modèle</button>
-        <button id="btnStop" class="danger">■ Décharger</button>
-        <button id="btnSaveCfg" class="ghost">Enregistrer config</button>
-        <button id="btnSaveProfile" class="ghost">💾 Profil du modèle</button>
+        <button id="btnStart" class="primary">▶ Load model</button>
+        <button id="btnStop" class="danger">■ Unload</button>
+        <button id="btnSaveCfg" class="ghost">Save config</button>
+        <button id="btnSaveProfile" class="ghost">💾 Model profile</button>
       </div>
       <div class="msg" id="serverMsg"></div>
-      <div class="hint">Le serveur s'ouvre dans un terminal dédié : logs en direct, fermer la fenêtre = arrêter.</div>
-      <div class="hint" style="color:#4ade80;">🔒 Sécurité : lié à 127.0.0.1 (machine locale uniquement) + clé API auto-générée. Aucun accès distant possible.</div>
+      <div class="hint">The server opens in a dedicated terminal: live logs, closing the window = stop.</div>
+      <div class="hint" style="color:#4ade80;">🔒 Security: bound to 127.0.0.1 (local machine only) + auto-generated API key. No remote access possible.</div>
     </section>
 
     <section class="card">
       <h2>Monitoring</h2>
       <div class="meter-row">
-        <span>Contexte</span>
+        <span>Context</span>
         <div class="meter"><div class="meter-fill" id="ctxFill"></div></div>
         <span class="mono" id="ctxVal">—</span>
       </div>
@@ -71,41 +71,41 @@
     </section>
   </div>
 
-  <!-- ===== Onglet Avancé ===== -->
+  <!-- ===== Advanced tab ===== -->
   <div id="tab-avance" class="tab-pane" style="display:none">
     <section class="card">
-      <h2>Performance (ligne de commande)</h2>
+      <h2>Performance (command line)</h2>
       <div class="grid2">
-        <div class="field"><label>Threads CPU (0 = auto)</label><input id="threads" type="number" min="0" step="1"></div>
-        <div class="field"><label>Threads batch (-tb, -1 = auto)</label><input id="threadsBatch" type="number" min="-1" step="1"></div>
+        <div class="field"><label>CPU threads (0 = auto)</label><input id="threads" type="number" min="0" step="1"></div>
+        <div class="field"><label>Batch threads (-tb, -1 = auto)</label><input id="threadsBatch" type="number" min="-1" step="1"></div>
         <div class="field"><label>Batch size (-b)</label><input id="batchSize" type="number" min="1" step="1"></div>
         <div class="field"><label>Micro-batch (-ub)</label><input id="ubatchSize" type="number" min="1" step="1"></div>
         <div class="field"><label>Main GPU (-1 = auto)</label><input id="mainGpu" type="number" min="-1" step="1"></div>
         <div class="field"><label>N-keep (0 = auto)</label><input id="nKeep" type="number" min="0" step="1"></div>
         <div class="field"><label>Timeout (s)</label><input id="timeout" type="number" min="1" step="1"></div>
-        <div class="field"><label>Tensor split (multi-GPU)</label><input id="tensorSplit" type="text" placeholder="ex: 24,24"></div>
+        <div class="field"><label>Tensor split (multi-GPU)</label><input id="tensorSplit" type="text" placeholder="e.g. 24,24"></div>
         <div class="field"><label>Split mode</label><select id="splitMode"><option value="">auto</option><option value="none">none</option><option value="layer">layer</option><option value="row">row</option></select></div>
       </div>
-      <div class="field checkbox-field"><label><input type="checkbox" id="mmap" checked> mmap (chargement mappé en mémoire)</label></div>
-      <div class="field checkbox-field"><label><input type="checkbox" id="mlock"> mlock (verrouiller en RAM)</label></div>
-      <div class="field checkbox-field"><label><input type="checkbox" id="noKvOffload"> no-kv-offload (KV cache sur CPU)</label></div>
-      <div class="field checkbox-field"><label><input type="checkbox" id="warmup" checked> warmup (passe de chauffe au démarrage)</label></div>
-      <div class="hint">Ces réglages s'appliquent au prochain démarrage du serveur (▶ Démarrer).</div>
+      <div class="field checkbox-field"><label><input type="checkbox" id="mmap" checked> mmap (memory-mapped loading)</label></div>
+      <div class="field checkbox-field"><label><input type="checkbox" id="mlock"> mlock (lock in RAM)</label></div>
+      <div class="field checkbox-field"><label><input type="checkbox" id="noKvOffload"> no-kv-offload (KV cache on CPU)</label></div>
+      <div class="field checkbox-field"><label><input type="checkbox" id="warmup" checked> warmup (warm-up pass at startup)</label></div>
+      <div class="hint">These settings apply at the next server start (▶ Start).</div>
     </section>
 
     <section class="card">
-      <h2>Raisonnement (thinking)</h2>
+      <h2>Reasoning (thinking)</h2>
       <div class="grid2">
         <div class="field">
           <label>Thinking (--reasoning)</label>
-          <select id="reasoning"><option value="auto">auto</option><option value="on">on (toujours)</option><option value="off">off (jamais)</option></select>
+          <select id="reasoning"><option value="auto">auto</option><option value="on">on (always)</option><option value="off">off (never)</option></select>
         </div>
         <div class="field">
-          <label>Effort de réflexion (à chaud)</label>
+          <label>Reasoning effort (hot)</label>
           <select id="reasoningEffort"><option value="">auto</option><option value="none">none</option><option value="low">low</option><option value="medium" selected>medium</option><option value="high">high</option><option value="xhigh">xhigh</option></select>
         </div>
         <div class="field">
-          <label>Budget de réflexion (tokens, -1 = illimité)</label>
+          <label>Reasoning budget (tokens, -1 = unlimited)</label>
           <input id="reasoningBudget" type="number" min="-1" step="1">
         </div>
         <div class="field">
@@ -113,11 +113,11 @@
           <select id="reasoningFormat"><option value="">auto</option><option value="deepseek">deepseek</option><option value="none">none</option></select>
         </div>
       </div>
-      <div class="hint">« Effort » s'applique immédiatement (à chaud). Les autres (thinking, budget, format) au prochain démarrage (▶ Démarrer).</div>
+      <div class="hint">"Effort" applies immediately (hot). The others (thinking, budget, format) apply at the next start (▶ Start).</div>
     </section>
 
     <section class="card">
-      <h2>Échantillonnage (sampling)</h2>
+      <h2>Sampling</h2>
       <div class="grid2">
         <div class="field"><label>Top-K (-1 = auto)</label><input id="topK" type="number" min="-1" step="1"></div>
         <div class="field"><label>Top-P</label><input id="topP" type="number" min="0" max="1" step="0.01"></div>
@@ -134,9 +134,9 @@
         <div class="field"><label>Dynatemp exponent</label><input id="dynatempExponent" type="number" min="0" max="10" step="0.1"></div>
         <div class="field"><label>XTC probability (0 = off)</label><input id="xtcProbability" type="number" min="0" max="1" step="0.01"></div>
         <div class="field"><label>XTC threshold</label><input id="xtcThreshold" type="number" min="0" max="1" step="0.01"></div>
-        <div class="field"><label>Seed (-1 = aléatoire)</label><input id="seed" type="number" min="-1" step="1"></div>
+        <div class="field"><label>Seed (-1 = random)</label><input id="seed" type="number" min="-1" step="1"></div>
       </div>
-      <div class="hint">Ces réglages s'appliquent aux réponses immédiatement (sans redémarrer).</div>
+      <div class="hint">These settings apply to responses immediately (no restart needed).</div>
     </section>
   </div>
 </main>

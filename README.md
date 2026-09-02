@@ -1,178 +1,180 @@
 # Llama Console 🦙
 
-Studio LLM local autonome — une base de « concurrent de Bionic LM Studio ».
+A local LLM studio — **100 % portable**: one folder = the whole app.
 
-> 👥 **Utilisateurs finaux** : voir **`readme.txt`** (installation, réglages pour
-> NVIDIA/CPU/AMD, dépannage).
+> 👥 **Languages:** 🇫🇷 [Français](README.fr.md) · 🇬🇧 English
 
-**Zero dépendance** (Node.js natif uniquement). Deux briques :
+> 📗 **End users**: see **`readme.txt`** (NVIDIA/CPU/AMD settings, troubleshooting).
 
-1. **Gestion du serveur llama.cpp** — choix du modèle `.gguf`, contexte, `-ngl`,
-   KV cache, flash-attn, port ; boutons Démarrer/Arrêter ; monitoring
-   (`/health`, `/slots`, GPU via `nvidia-smi`).
-2. **Client de chat streaming** — multi-tours, affichage du raisonnement
-   `<think>` de Qwen3 dans un volet repliable, paramètres (max_tokens,
-   temperature, system prompt).
+## 📦 100 % portable — zero AI-stack installation
 
-## Lancer
+The **portable ComfyUI experience**: everything lives in **one folder** — the
+**llama.cpp engine, CUDA 12 runtime, models (.gguf), web UI, coding agent**.
+Double-click `start.bat`, and you're off.
 
-Double-clic **`start.bat`** (ou `node server.js`), puis ouvre
+- **Copy the folder → it works**: USB stick, another PC, another drive. Paths are
+  computed from the folder location, with **self-repair** if the folder is moved.
+- **No AI-stack installation**: llama.cpp, CUDA 12 runtime (cudart/cublas) and
+  models are **bundled** — no CUDA Toolkit install, no LM Studio.
+- **No system configuration**: no registry, no global dependencies, no leftover
+  files — config, logs and history stay **inside the folder**.
+- **100 % local**: the LLM runs on your machine, data never leaves it.
+- **Only prerequisites**: Windows, Node.js 18+ (for the web UI), and the NVIDIA
+  driver if you use a GPU (CUDA is already bundled).
+
+**No npm dependencies** (Node.js native only). Two building blocks:
+
+1. **llama.cpp server management** — `.gguf` model picker, context size, `-ngl`,
+   KV cache, flash-attn, port; Start/Stop buttons; monitoring (`/health`,
+   `/slots`, GPU via `nvidia-smi`).
+2. **Streaming chat client** — multi-turn, Qwen3 `<think>` reasoning shown in a
+   collapsible panel, parameters (max_tokens, temperature, system prompt).
+
+## Getting started
+
+Double-click **`start.bat`** (or `node server.js`), then open
 **http://127.0.0.1:8787**.
 
-- **Démarrer le serveur** : bouton **Config** (en bas à droite) → page de
-  configuration → **▶ Démarrer (terminal)**. Le serveur llama.cpp s'ouvre dans un
-  **terminal dédié** (logs en direct). **Fermer ce terminal = arrêter le serveur.**
-- **Discuter** : revenir sur la page principale, taper dans la barre d'input
-  (au-dessus de la barre de tokens du bas).
-- La **barre du bas** affiche en permanence le remplissage du contexte, les infos
-  GPU, et le bouton **Config**.
-- Fermer la fenêtre console de `start.bat` arrête le serveur web (le terminal
-  llama.cpp, lui, continue tant que tu ne le fermes pas).
+- **Start the server**: **Config** button (bottom right) → configuration page →
+  **▶ Load model (terminal)**. The llama.cpp server opens in a **dedicated
+  terminal** (live logs). **Closing that terminal stops the server.**
+- **Chat**: back on the main page, type in the input bar (above the bottom
+  token bar).
+- The **bottom bar** always shows context usage, GPU info, and the **Config**
+  button.
+- Closing the `start.bat` console window stops the web server (the llama.cpp
+  terminal keeps running until you close it).
 
-## Configuration & portabilité 📦
+## Configuration & portability 📦
 
-Le projet est **autonome** : tout est dans son dossier, pas de dépendance externe
-(LM Studio n'est plus nécessaire).
+The project is **self-contained**: everything lives in its folder, no external
+dependency (LM Studio no longer needed).
 
 ```
 llama-console/
-├── backend/          llama-server.exe + DLLs + runtime CUDA (cudart/cublas)
-├── models/           les .gguf (Qwen3.8-27B-Q4_K_M.gguf, …)
-├── server.js         serveur web + gestion du process + proxy chat
+├── backend/          llama-server.exe + DLLs + CUDA runtime (cudart/cublas)
+├── models/           the .gguf files (Qwen3.8-27B-Q4_K_M.gguf, …)
+├── server.js         web server + process management + chat proxy
 ├── public/           UI (index.html, config.html, app.js, config.js, style.css)
-├── config.json       chemins + réglages (auto-créé)
-└── start.bat         lanceur double-clic
+├── config.json       paths + settings (auto-created)
+└── start.bat         double-click launcher
 ```
 
-- **`config.json`** pointe vers `backend/` et `models/` **du projet** (chemins
-  calculés depuis l'emplacement de `server.js` → **le dossier se déplace/copie
-  tel quel**).
-- **Auto-réparation** : si un chemin de `config.json` n'existe plus (dossier
-  déplacé), l'app revient automatiquement au défaut portable.
-- Logs du serveur : `llama-server.log`. Le lancement génère `run-server.bat`.
-- Pour ajouter un modèle : déposer le `.gguf` dans `models/` (hors mmproj), puis
-  « ↻ » dans la page Config.
+- **`config.json`** points to the project's own `backend/` and `models/` (paths
+  computed from `server.js`'s location → **the folder can be moved/copied as-is**).
+- **Self-repair**: if a path in `config.json` no longer exists (moved folder),
+  the app automatically falls back to the portable default.
+- Server logs: `llama-server.log`. Launching generates `run-server.bat`.
+- To add a model: drop the `.gguf` into `models/` (no mmproj), then press « ↻ »
+  on the Config page.
 
 ## Architecture
 
 ```
-server.js          serveur HTTP + gestion du process llama + proxy chat SSE
-public/index.html  page principale : chat + barre de tokens du bas
-public/app.js      logique chat (streaming, <think>, compaction) + barre du bas
-public/config.html page de configuration du serveur (modèle, contexte, monitoring)
-public/config.js   logique du panneau de configuration
-public/style.css   thème sombre
+server.js          HTTP server + llama process management + SSE chat proxy
+public/index.html  main page: chat + bottom token bar
+public/app.js      chat logic (streaming, <think>, compaction) + bottom bar
+public/config.html server configuration page (model, context, monitoring)
+public/config.js   configuration panel logic
+public/style.css   dark theme
 ```
 
-Routes : `/api/state`, `/api/config`, `/api/models`, `/api/server/start`,
+Routes: `/api/state`, `/api/config`, `/api/models`, `/api/server/start`,
 `/api/server/stop`, `/api/chat` (SSE), `/api/compact`, `/api/gpu`.
 
-## Réglages par défaut (optimisés Qwen + RTX 3090)
+## Default settings (optimized for Qwen + RTX 3090)
 
-Les valeurs par défaut de `config.json` et du profil `Qwen3.8-27B…gguf.json` sont
-**testées/optimisées pour Qwen3.8-27B (Q4_K_M) + RTX 3090 24 Go** :
+The defaults in `config.json` and the `Qwen3.8-27B…gguf.json` profile are
+**tested/optimized for Qwen3.8-27B (Q4_K_M) + RTX 3090 24 GB**:
 
-- **Serveur** : `--ctx-size 131072 -ngl 99 --cache-type-k/v q4_0 --flash-attn on -b 4096 -ub 512`
-  → 128k de contexte stable, modèle 100 % sur GPU (VRAM ~19 Go).
-- **Raisonnement** : `--reasoning-format deepseek` + effort `medium` (bon équilibre
-  vitesse/qualité ; `low` = rapide, `high`/`xhigh` = tâches difficiles).
-- **Sortie** : `max_tokens 8192` (le code long n'est plus coupé).
-- **Sampling** : `temp 0.7 · top_p 0.95 · min_p 0.05 · repeat_penalty 1.0` (standard Qwen3).
-- **Compaction** : seuil `80 %`, résumé + 4 derniers messages (tronqués à 3000 car.).
+- **Server**: `--ctx-size 131072 -ngl 99 --cache-type-k/v q4_0 --flash-attn on -b 4096 -ub 512`
+  → stable 128k context, model 100 % on GPU (~19 GB VRAM).
+- **Reasoning**: `--reasoning-format deepseek` + effort `medium` (good
+  speed/quality balance; `low` = fast, `high`/`xhigh` = hard tasks).
+- **Output**: `max_tokens 16384` (long code no longer truncated).
+- **Sampling**: `temp 0.7 · top_p 0.95 · min_p 0.05 · repeat_penalty 1.0` (standard Qwen3).
+- **Compaction**: threshold `80 %`, summary + last 4 messages (truncated to 3000 chars).
 
-Autre machine (moins de VRAM, CPU, AMD) → adapter via la page Config (voir `readme.txt` §4).
+Other hardware (less VRAM, CPU, AMD) → adjust via the Config page (see `readme.txt` §4).
 
-## Compaction de contexte 🧹
+## Context compaction 🧹
 
-Pour **alléger les ressources** (moins de tokens envoyés = moins de calcul = moins
-d'énergie) quand la conversation grossit :
+To **save resources** (fewer tokens sent = less compute = less energy) as the
+conversation grows:
 
-- **Seuil auto** : dans ⚙ Paramètres, « Seuil compaction auto (%) » (défaut 80 %).
-  Quand le contexte atteint ce % (mesuré via `/slots`), l'historique est résumé
-  automatiquement par le modèle local, le résumé est injecté dans le system prompt,
-  et seuls les 4 derniers messages (tronqués à 3000 caractères) sont conservés.
-- **Manuel** : bouton « 🧹 Compacter maintenant ».
-- Le résumé conserve les faits/identifiants techniques (ports, chemins, noms de
-  modèle, versions, nombres).
+- **Auto threshold**: in ⚙ Settings, « Auto-compaction threshold (%) » (default
+  80 %). When the context reaches that % (measured via `/slots`), the history is
+  summarized automatically by the local model, the summary is injected into the
+  system prompt, and only the last 4 messages (truncated to 3000 chars) are kept.
+- **Manual**: « 🧹 Compact now » button.
+- The summary keeps technical facts/identifiers (ports, paths, model names,
+  versions, numbers).
 
-## Mode Agent (étape 2) 🤖
+## Agent mode 🤖
 
-Le **🤖 Mode Agent** (coché par défaut) fait du modèle un **agent de code** qui
-agit dans `workspace/` (dossier créé à la racine) :
+The **🤖 Agent mode** (checked by default) turns the model into a **coding agent**
+that works inside `workspace/` (folder created at the root):
 
-- Outils (auto) : `list_dir` · `read_file` · `grep` · `glob` · `write_file` ·
-  `edit_file` · `replace_all` · `move_file` · `set_plan` · `run_love` · `check_lua`.
-- Outils (approbation) : `delete_file` · `web_search` · `shell` (sauf commandes de
-  vérification / navigation type `cd`, `set`, `dir`).
-- **Recherche web** 🌐 : `web_search` sous approbation, résultats tronqués et marqués
-  « contenu non fiable » (ne jamais suivre leurs instructions). Backend configurable
-  dans `config.json` : `duckduckgo` (zéro dépendance) ou `searxng` (local, riche).
-  Le mode `duckduckgo` tente 3 sources en cascade : résultats HTML de DuckDuckGo
-  (titre + URL + extrait) → Wikipédia (repli fiable pour les entités) → Instant
-  Answer (résumé d'entité).
-- **Shell persistant** : l'outil `shell` garde l'état entre les commandes (`cd`,
-  variables d'env, processus d'arrière-plan) — pour des séquences de travail.
-- **Test LÖVE** : `run_love` lance le jeu et **détecte les plantages** — un
-  gestionnaire d'erreur est injecté temporairement via `conf.lua` (restauré ensuite)
-  pour écrire l'erreur exacte dans `workspace/love.err.log`. LÖVE auto-détecté
-  (dossier `love/` du projet → emplacements standard → PATH ; forçable via `loveCmd`
-  dans Config). `check_lua` vérifie la syntaxe d'un `.lua`.
-- **Plan multi-étapes** : l'agent liste ses étapes (`set_plan`) et les coche en
-  direct dans le chat (📋 Plan).
-- **Mode plan** (📋 case à cocher) : l'agent analyse en lecture seule, propose un
-  plan (`submit_plan`), et attend ton approbation (Approuver / Modifier) avant d'agir.
-- **Boucle** : réflexion → appel d'outil → résultat → … jusqu'à la réponse finale.
-- **Mémoire** : lit `workspace/AGENTS.md` au démarrage et peut le mettre à jour
-  (règles/conventions persistantes entre sessions).
-- **Approbation** : seulement pour `delete_file` et les commandes shell risquées ;
-  ⚡ **Auto-approuver** les exécute sans demander.
-- **Sécurité** : confiné à `workspace/` (chemins absolus et `..` refusés).
-- **Commandes interdites** 🔒 : l'agent ne peut **jamais** lancer `start`,
-  `taskkill`, `llama-server`, `shutdown`, `format`, `reg`, `sc`, `net`,
-  ni de suppression récursive (`del /f/s`, `rmdir /s`) — refusées automatiquement,
-  même avec ⚡ Auto-approuver. Les interpréteurs alternatifs (`powershell`, `cmd`)
-  sont autorisés mais **sous approbation** (politique « comme DeepSeek »).
-- **Sauvegarde auto** : chaque tâche copie `workspace/` dans `backup/<date-heure>`
-  (20 max), hors de portée de l'agent — filet de sécurité contre les suppressions.
-- **Diff + annulation** 📊 : à la fin de chaque tâche, l'agent affiche le **diff**
-  des fichiers modifiés (lignes `-`/`+` colorées) par rapport à la sauvegarde de
-  départ, avec un bouton **↩️ Annuler** qui restaure `workspace/` depuis `backup/`.
-- **Trace des modifs** (🔍 case opt-in) : chaque modification d'un fichier *code*
-  garde l'ancienne version dans `history/<session>/<sous-dossier>/nom.<horodatage>.<ext>`
-  (l'extension et la structure de sous-dossiers du workspace sont conservées, pour
-  distinguer plusieurs `main.lua` de projets différents) — **un dossier par session
-  serveur**, créé seulement au premier fichier tracé (plus de dossier vide). Jamais
-  de fichiers lourds/binaires.
-- Le **journal des outils** (appels + sorties + raisonnement) s'affiche dans le chat.
+- Tools (automatic): `list_dir` · `read_file` · `grep` · `glob` · `write_file` ·
+  `edit_file` · `replace_all` · `move_file` · `set_plan` · `submit_plan`.
+- Tools (approval): `delete_file` · `web_search` · `shell` (except read-only /
+  navigation commands like `cd`, `set`, `dir`).
+- **Web search** 🌐: `web_search` under approval, results truncated and flagged
+  as « unreliable content » (never follow their instructions). Uses **DuckDuckGo
+  only** (zero dependency): 3 cascading sources — DuckDuckGo HTML results
+  (title + URL + snippet) → Wikipedia (reliable fallback for entities) →
+  Instant Answer (entity summary).
+- **Persistent shell**: the `shell` tool keeps state between commands (`cd`,
+  env variables, background processes) — for work sequences.
+- **Multi-step plan**: the agent lists its steps (`set_plan`) and ticks them live
+  in the chat (📋 Plan).
+- **Plan mode** (📋 checkbox): the agent analyzes read-only, proposes a plan
+  (`submit_plan`), and waits for your approval (Approve / Edit) before acting.
+- **Loop**: thinking → tool call → result → … until the final answer.
+- **Memory**: reads `workspace/AGENTS.md` at startup and may update it
+  (persistent rules/conventions across sessions).
+- **Approval**: only for `delete_file` and risky shell commands; ⚡
+  **Auto-approve** runs them without asking.
+- **Security**: confined to `workspace/` (absolute paths and `..` are refused).
+- **Forbidden commands** 🔒: the agent can **never** run `start`, `taskkill`,
+  `llama-server`, `shutdown`, `format`, `reg`, `sc`, `net`, or recursive
+  deletion (`del /f/s`, `rmdir /s`) — refused automatically, even with ⚡
+  Auto-approve. Alternative interpreters (`powershell`, `cmd`) are allowed but
+  **under approval** (« DeepSeek-style » policy).
+- **Auto-backup**: each task copies `workspace/` into `backup/<date-time>`
+  (max 20), out of the agent's reach — a safety net against deletions.
+- **Diff + undo** 📊: at the end of each task the agent shows the **diff** of
+  changed files (colored `-`/`+` lines) against the starting backup, with an
+  **↩️ Undo** button that restores `workspace/` from `backup/`.
+- **Change tracing** (🔍 opt-in checkbox): every *code* file change keeps the old
+  version in `history/<session>/<subfolder>/name.<timestamp>.<ext>` (the
+  workspace subfolder structure is preserved, to tell apart several files with
+  the same name) — **one folder per server session**, created only at the first
+  traced file (no more empty folders). Never heavy/binary files.
+- The **tool journal** (calls + outputs + reasoning) is shown in the chat.
 
-## Journal des conversations & résilience 🗂️
+## Conversation journal & resilience 🗂️
 
-- **`conversations/conversations.jsonl`** : **toutes** les conversations (mode agent
-  **et** chat simple) sont écrites en **temps réel** dans un fichier unique (format
-  JSONL — une ligne JSON par événement, ajoutée au fur et à mesure). Chaque ligne
-  porte l'identifiant de la tâche (`runId` pour l'agent, `id` pour le chat) pour
-  regrouper ses événements. Même si l'agent plante ou que tu coupes, ce qui a déjà
-  eu lieu est sauvegardé.
-- **Taille maîtrisée** : le raisonnement est loggé **agrégé** (une ligne par tour,
-  pas par fragment), les sorties d'outils sont tronquées au-delà de 4000 car., et
-  le fichier **tourne automatiquement** au-delà de 8 Mo (renommé
-  `conversations-<horodatage>.jsonl`, un nouveau `conversations.jsonl` repart).
-- **Résilience réseau** : les appels HTTP vers llama-server utilisent une connexion
-  fraîche à chaque requête (pas de socket keep-alive mort) et l'agent ré-essaie
-  automatiquement une fois en cas de « socket hang up ».
+- **`conversations/conversations.jsonl`**: **all** conversations (agent mode
+  **and** simple chat) are written **in real time** to a single file (JSONL —
+  one JSON line per event, appended as it happens). Each line carries the task
+  id (`runId` for the agent, `id` for chat) to group its events. Even if the
+  agent crashes or you cut power, what already happened is saved.
+- **Bounded size**: reasoning is logged **aggregated** (one line per turn, not
+  per fragment), tool outputs are truncated beyond 4000 chars, and the file
+  **rotates automatically** past 8 MB (renamed
+  `conversations-<timestamp>.jsonl`, a new `conversations.jsonl` starts).
+- **Network resilience**: HTTP calls to llama-server use a fresh connection per
+  request (no dead keep-alive socket) and the agent automatically retries once
+  on « socket hang up ».
 
-## 💝 Soutenir le projet
+## 💝 Support the project
 
-Si ce projet t'aide, tu peux soutenir son développement :
+If this project helps you, you can support its development:
 
 - 🏢 [GitHub Sponsors](https://github.com/sponsors/autostoppeur48)
-- ☕ [Ko-fi](https://ko-fi/TONPSEUDO)
-- 🇫🇷 [Tipeee](https://fr.tipeee.com/TONPSEUDO)
-- 🎁 [Liberapay](https://liberapay.com/TONPSEUDO) *(dons déductibles en France)*
 
-> Remplace `TONPSEUDO` par tes identifiants respectifs (ou supprime les lignes
-> qui ne concernent pas ton projet).
+## 🙏 Credits
 
----
-
-Briques restantes pour un vrai Bionic : diff/annulation.
+To my comrade **DeepSeek**, without whom this project would never have seen the
+light of day.

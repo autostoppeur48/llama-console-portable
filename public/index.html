@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,7 +9,7 @@
 <body>
 <header>
   <div class="brand">🦙 Llama Console</div>
-  <div class="status" id="statusPill"><span class="dot off" id="statusDot"></span><span id="statusText">hors ligne</span></div>
+  <div class="status" id="statusPill"><span class="dot off" id="statusDot"></span><span id="statusText">offline</span></div>
 </header>
 
 <main>
@@ -17,7 +17,7 @@
 
   <div class="params">
     <details>
-      <summary>⚙ Paramètres</summary>
+      <summary>⚙ Settings</summary>
       <div class="grid2">
         <div class="field">
           <label>max_tokens</label>
@@ -28,17 +28,17 @@
           <input id="temperature" type="number" min="0" max="2" step="0.1">
         </div>
         <div class="field">
-          <label>Seuil compaction auto (%)</label>
+          <label>Auto-compaction threshold (%)</label>
           <input id="compactPct" type="number" min="10" max="95" step="5">
         </div>
       </div>
       <div class="field">
-        <label>System prompt (optionnel)</label>
-        <textarea id="systemPrompt" rows="3" placeholder="Tu es un assistant utile..."></textarea>
+        <label>System prompt (optional)</label>
+        <textarea id="systemPrompt" rows="3" placeholder="You are a helpful assistant..."></textarea>
       </div>
       <div class="actions">
-        <button id="btnCompact" class="ghost">🧹 Compacter maintenant</button>
-        <button id="btnClear" class="ghost">Nouvelle conversation</button>
+        <button id="btnCompact" class="ghost">🧹 Compact now</button>
+        <button id="btnClear" class="ghost">New conversation</button>
       </div>
       <div class="compact-status" id="compactStatus"></div>
     </details>
@@ -46,13 +46,13 @@
 
   <div class="composer">
     <div class="agent-bar">
-      <label class="toggle"><input type="checkbox" id="agentToggle" checked> 🤖 Mode Agent</label>
-      <label class="toggle" id="agentAutoApproveWrap"><input type="checkbox" id="agentAutoApprove" title="Exécuter les commandes shell sans demander"> ⚡ Auto-approuver</label>
+      <label class="toggle"><input type="checkbox" id="agentToggle" checked> 🤖 Agent mode</label>
+      <label class="toggle" id="agentAutoApproveWrap"><input type="checkbox" id="agentAutoApprove" title="Run shell commands without asking"> ⚡ Auto-approve</label>
 
-      <label class="toggle"><input type="checkbox" id="planMode" title="Proposer un plan avant d'agir et attendre ton approbation"> 📋 Mode plan</label>
-      <label class="toggle"><input type="checkbox" id="traceMode" title="Tracer chaque modification de fichier code dans history/"> 🔍 Tracer les modifs</label>
+      <label class="toggle"><input type="checkbox" id="planMode" title="Propose a plan before acting and wait for your approval"> 📋 Plan mode</label>
+      <label class="toggle"><input type="checkbox" id="traceMode" title="Trace every code file change in history/"> 🔍 Trace changes</label>
     </div>
-    <select id="reasoningEffortChat" class="reasoning-select" title="Effort de réflexion">
+    <select id="reasoningEffortChat" class="reasoning-select" title="Reasoning effort">
       <option value="">🧠 auto</option>
       <option value="none">🧠 none</option>
       <option value="low">🧠 low</option>
@@ -60,8 +60,8 @@
       <option value="high">🧠 high</option>
       <option value="xhigh">🧠 xhigh</option>
     </select>
-    <textarea id="input" rows="5" placeholder="Écris ton message… (Entrée = envoyer, Maj+Entrée = saut de ligne)"></textarea>
-    <button id="btnSend" class="primary">Envoyer</button>
+    <textarea id="input" rows="5" placeholder="Type your message… (Enter = send, Shift+Enter = new line)"></textarea>
+    <button id="btnSend" class="primary">Send</button>
   </div>
 </main>
 
