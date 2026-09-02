@@ -218,17 +218,13 @@ agit dans `workspace/` (dossier créé à la racine) :
 
 ## 💝 Soutenir le projet
 
-Llama Console est **gratuit et open source**. Si ça te fait gagner du temps ou
-t'aide dans tes projets, un petit geste fait toujours plaisir :
+Llama Console est **gratuit et open source**. Si ça t'aide, un petit don est
+toujours apprécié :
 
-[![Sponsoriser sur GitHub](https://img.shields.io/badge/Sponsoriser%20sur%20GitHub-30363D?style=for-the-badge&logo=github-sponsors&logoColor=white)](https://github.com/sponsors/autostoppeur48)
 [![Faire un don PayPal](https://img.shields.io/badge/Faire%20un%20don%20PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://paypal.me/teophanonica)
 
-- 🏢 **GitHub Sponsors** — soutien mensuel ou ponctuel.
-- 💛 **PayPal** — don ponctuel, pas besoin de compte de ton côté.
-
-Tu veux une amélioration ou une fonctionnalité sur mesure ? Ouvre une *issue* —
-ou contacte-moi directement, c'est toujours un plaisir d'échanger.
+Tu veux une amélioration ou une fonctionnalité sur mesure ? Ouvre une *issue*
+sur le repo — avec plaisir d'en discuter.
 
 ## 🙏 Crédits
 
