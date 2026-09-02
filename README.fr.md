@@ -1,6 +1,6 @@
 # Llama Console 🦙
 
-Studio LLM local — **100 % portable** : un seul dossier = toute l'application.
+Studio LLM local — **100 % portable et configurable** : un seul dossier = toute l'application.
 
 > 👥 **Langues :** 🇫🇷 Français · 🇬🇧 [English](README.md)
 
