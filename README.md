@@ -204,14 +204,11 @@ that works inside `workspace/` (folder created at the root):
 
 ## 💝 Support the project
 
-Llama Console is **free and open source**. If it saves you time or helps your
-projects, a small token of appreciation goes a long way:
+Llama Console is **free and open source**. If it helps you, a small donation
+is always appreciated:
 
-[![Sponsor on GitHub](https://img.shields.io/badge/Sponsor%20on%20GitHub-30363D?style=for-the-badge&logo=github-sponsors&logoColor=white)](https://github.com/sponsors/autostoppeur48)
 [![Donate with PayPal](https://img.shields.io/badge/Donate%20with%20PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://paypal.me/teophanonica)
 
-- 🏢 **GitHub Sponsors** — monthly or one-time support.
-- 💛 **PayPal** — one-time donation, no account needed on your side.
 
 Want a custom feature or improvement? Open an issue — or contact me directly,
 it's always good to talk.
