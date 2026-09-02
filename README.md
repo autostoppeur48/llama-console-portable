@@ -1,6 +1,6 @@
 # Llama Console 🦙
 
-A local LLM studio — **100 % portable**: one folder = the whole app.
+A local LLM studio — **100 % portable and configurable**: one folder = the whole app.
 
 > 👥 **Languages:** 🇫🇷 [Français](README.fr.md) · 🇬🇧 English
 
