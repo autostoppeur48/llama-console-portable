@@ -3,8 +3,9 @@
 ==========================================================
 
 Self-contained local LLM studio: runs a llama.cpp server
-+ a streaming chat. Everything is included in this folder
-(engine, models, UI) except two things: Node.js and a GPU driver.
++ a streaming chat. The engine, CUDA runtime and UI are included
+in this folder; you only add a model (.gguf in models/) plus two
+system things: Node.js and a GPU driver.
 
 ----------------------------------------------------------
  1) INSTALL BEFORE LAUNCHING
@@ -32,10 +33,12 @@ Self-contained local LLM studio: runs a llama.cpp server
  1. Double-click  start.bat
     -> a console opens (web UI) and the browser
        launches on  http://127.0.0.1:8787
- 2. Click the "Config" button (bottom right of the page).
- 3. Click "Load model (terminal)".
+ 2. If models\ is empty: download a .gguf instruct model
+    (e.g. Qwen3.8-27B-Q4_K_M.gguf, ~16 GB) and drop it in models\.
+ 3. Click the "Config" button (bottom right of the page).
+ 4. Click "Load model (terminal)".
     -> a terminal opens and loads the model (live logs).
- 4. Go back to the main page and type in the input bar.
+ 5. Go back to the main page and type in the input bar.
 
  Shutdown:
    - Closing the llama.cpp terminal = stops the model server.

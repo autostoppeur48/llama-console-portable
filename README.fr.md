@@ -7,18 +7,42 @@ Studio LLM local — **100 % portable** : un seul dossier = toute l'application.
 > 📗 **Guide utilisateur** : voir **`readme.txt`** (en anglais — réglages
 > NVIDIA/CPU/AMD, dépannage).
 
+## ✨ Qu'est-ce qu'on peut faire avec ?
+
+Llama Console est un **atelier IA privé** qui tourne entièrement sur ta machine —
+pas de cloud, pas de compte, rien ne sort de ton PC.
+
+- **💬 Discuter avec un LLM local** — poser des questions, réfléchir, écrire,
+  traduire, expliquer du code… Le raisonnement du modèle s'affiche en direct
+  dans un volet repliable.
+- **🤖 Coder avec un agent** — bascule en *mode Agent* : l'IA devient un
+  assistant de code confiné dans son dossier `workspace/` : elle lit et fouille
+  tes fichiers, écrit et modifie du code, lance des commandes, et itère jusqu'au
+  résultat. Les actions sensibles demandent ton approbation.
+- **📋 Mode plan** — pour les grosses tâches, l'agent propose d'abord un plan
+  étape par étape ; tu l'approuves (ou tu envoies tes remarques), *puis* il
+  exécute.
+- **🌐 Chercher sur le web** — l'agent peut interroger DuckDuckGo pour des infos
+  actuelles au-delà des connaissances du modèle.
+- **🖥️ Piloter ton propre serveur LLM** — choisir un modèle `.gguf`, régler la
+  taille du contexte et les couches GPU, démarrer/arrêter, et surveiller en
+  direct l'occupation du contexte et les stats GPU.
+
 ## 📦 100 % portable — zéro installation de la stack IA
 
 L'expérience d'un **ComfyUI portable** : tout tient dans **un seul dossier** —
-**moteur llama.cpp, runtime CUDA 12, modèles (.gguf), interface web, agent de
-code**. Double-clic sur `start.bat`, et c'est parti.
+**moteur llama.cpp, runtime CUDA 12, interface web, agent de code**.
+Double-clic sur `start.bat`, dépose un modèle dans `models/`, et c'est parti.
 
 - **Copie le dossier → ça marche** : clé USB, autre PC, autre disque. Les chemins
   sont calculés depuis l'emplacement du dossier, avec **auto-réparation** si le
   dossier est déplacé.
-- **Aucune installation de la stack IA** : llama.cpp, runtime CUDA 12 (cudart/
-  cublas) et modèles sont **embarqués** — pas d'installation du CUDA Toolkit,
+- **Aucune installation de la stack IA** : llama.cpp et le runtime CUDA 12
+  (cudart/cublas) sont **embarqués** — pas d'installation du CUDA Toolkit,
   pas de LM Studio.
+- **Le modèle est la seule chose à ajouter** : télécharge un GGUF (par ex. un
+  modèle instruct Qwen3 ou Llama, ~4-20 Go) et dépose-le dans `models/` — c'est
+  tout.
 - **Aucune configuration système** : pas de registre, pas de dépendances
   globales, pas de fichiers résiduels — config, logs et historique restent
   **dans le dossier**.
@@ -60,7 +84,7 @@ Le projet est **autonome** : tout est dans son dossier, pas de dépendance exter
 ```
 llama-console/
 ├── backend/          llama-server.exe + DLLs + runtime CUDA (cudart/cublas)
-├── models/           les .gguf (Qwen3.8-27B-Q4_K_M.gguf, …)
+├── models/           dépose ton .gguf ici (+ profils .gguf.json par modèle)
 ├── server.js         serveur web + gestion du process + proxy chat
 ├── public/           UI (index.html, config.html, app.js, config.js, style.css)
 ├── config.json       chemins + réglages (auto-créé)
@@ -183,6 +207,7 @@ agit dans `workspace/` (dossier créé à la racine) :
 Si ce projet t'aide, tu peux soutenir son développement :
 
 - 🏢 [GitHub Sponsors](https://github.com/sponsors/autostoppeur48)
+- 💛 Tu veux des améliorations ou de nouvelles fonctionnalités ? Soutiens-moi ici : [PayPal](https://paypal.me/teophanonica)
 
 ## 🙏 Crédits
 

@@ -6,16 +6,36 @@ A local LLM studio — **100 % portable**: one folder = the whole app.
 
 > 📗 **End users**: see **`readme.txt`** (NVIDIA/CPU/AMD settings, troubleshooting).
 
+## ✨ What can you do with it?
+
+Llama Console is a **private AI workbench** that runs entirely on your machine —
+no cloud, no account, nothing leaves your PC.
+
+- **💬 Chat with a local LLM** — ask questions, brainstorm, write, translate,
+  explain code… The model's live reasoning is shown in a collapsible panel.
+- **🤖 Code with an agent** — flip to *Agent mode* and the AI becomes a coding
+  assistant confined to its own `workspace/` folder: it reads and searches your
+  files, writes and edits code, runs commands, and iterates until the job is
+  done. Sensitive actions require your approval.
+- **📋 Plan mode** — for bigger tasks the agent first proposes a step-by-step
+  plan; you approve it (or send feedback), *then* it executes.
+- **🌐 Look things up** — the agent can search the web (DuckDuckGo) for current
+  facts beyond the model's knowledge.
+- **🖥️ Drive your own LLM server** — pick a `.gguf` model, set context size and
+  GPU layers, start/stop it, and watch context usage + GPU stats live.
+
 ## 📦 100 % portable — zero AI-stack installation
 
 The **portable ComfyUI experience**: everything lives in **one folder** — the
-**llama.cpp engine, CUDA 12 runtime, models (.gguf), web UI, coding agent**.
-Double-click `start.bat`, and you're off.
+**llama.cpp engine, CUDA 12 runtime, web UI, coding agent**.
+Double-click `start.bat`, drop a model in `models/`, and you're off.
 
 - **Copy the folder → it works**: USB stick, another PC, another drive. Paths are
   computed from the folder location, with **self-repair** if the folder is moved.
-- **No AI-stack installation**: llama.cpp, CUDA 12 runtime (cudart/cublas) and
-  models are **bundled** — no CUDA Toolkit install, no LM Studio.
+- **No AI-stack installation**: llama.cpp, CUDA 12 runtime (cudart/cublas) are
+  **bundled** — no CUDA Toolkit install, no LM Studio.
+- **The model is the only thing to add**: download any GGUF (e.g. a Qwen3 or
+  Llama instruct model, ~4–20 GB) and drop it in `models/` — that's it.
 - **No system configuration**: no registry, no global dependencies, no leftover
   files — config, logs and history stay **inside the folder**.
 - **100 % local**: the LLM runs on your machine, data never leaves it.
@@ -53,7 +73,7 @@ dependency (LM Studio no longer needed).
 ```
 llama-console/
 ├── backend/          llama-server.exe + DLLs + CUDA runtime (cudart/cublas)
-├── models/           the .gguf files (Qwen3.8-27B-Q4_K_M.gguf, …)
+├── models/           drop your .gguf here (+ per-model .gguf.json profiles)
 ├── server.js         web server + process management + chat proxy
 ├── public/           UI (index.html, config.html, app.js, config.js, style.css)
 ├── config.json       paths + settings (auto-created)
@@ -173,6 +193,7 @@ that works inside `workspace/` (folder created at the root):
 If this project helps you, you can support its development:
 
 - 🏢 [GitHub Sponsors](https://github.com/sponsors/autostoppeur48)
+- 💛 Want improvements or new features? Support me here: [PayPal](https://paypal.me/teophanonica)
 
 ## 🙏 Credits
 
