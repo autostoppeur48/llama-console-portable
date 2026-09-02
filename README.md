@@ -1,4 +1,15 @@
 # Llama Console 🦙
+## ⬇️ Download
+
+**Llama Console v1.0.0 — 100 % portable, no installation**
+
+[![Download v1.0.0](https://img.shields.io/badge/Download-v1.0.0-4CAF50?style=for-the-badge&logo=github)](https://github.com/autostoppeur48/llama-console-portable/releases/download/v1.0.0/llama-console-portable-1.0.0.7z)
+
+1. Download and **unzip** the archive (7-Zip / NanaZip / WinRAR).
+2. Drop a `.gguf` model into `models/`.
+3. Double-click `start.bat` — you're done.
+
+*(Source code and previous versions are on the [release page](https://github.com/autostoppeur48/llama-console-portable/releases).)*
 
 A local LLM studio — **100 % portable and configurable**: one folder = the whole app.
 
