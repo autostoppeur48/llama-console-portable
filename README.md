@@ -4,7 +4,7 @@
 
 ## ⬇️ Download
 
-**Llama Console v1.0.0 — 100 % portable, no installation**
+**Llama Console v1.0.0 — 100 % portable and configurable, no installation**
 
 [![Download v1.0.0](https://img.shields.io/badge/Download-v1.0.0-4CAF50?style=for-the-badge&logo=github)](https://github.com/autostoppeur48/llama-console-portable/releases/download/v1.0.0/llama-console-portable-1.0.0.7z)
 
