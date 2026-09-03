@@ -1,4 +1,4 @@
-# Llama Console 🦙
+# Llama Console Portable 🦙
 ![GitHub Release](https://img.shields.io/github/v/release/autostoppeur48/llama-console-portable)
 ![Downloads](https://img.shields.io/github/downloads/autostoppeur48/llama-console-portable/total)
 
